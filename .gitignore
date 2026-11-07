@@ -42,3 +42,6 @@ Thumbs.db
 data/slang.index.bin
 data/slang.current.txt
 data/history.txt
+
+# Big test data (sinh bởi tools/GenerateBigData.java)
+data/slang.100k.txt

@@ -85,7 +85,7 @@ slang-dictionary/
 │   ├── main/java/com/slangdict/
 │   │   ├── Main.java
 │   │   ├── model/              # SlangWord (POJO, Serializable)
-│   │   ├── repository/         # đọc/ghi file: SlangFileReader, SlangFileWriter, HistoryStore, IndexStore
+│   │   ├── repository/         # đọc/ghi file: SlangFileReader, SlangFileWriter, DataBootstrap, HistoryStore, IndexStore
 │   │   ├── index/              # SlangIndex (HashMap + inverted index)
 │   │   ├── service/            # DictionaryService (logic), QuizService, HistoryService
 │   │   ├── ui/                 # MainFrame + panels: SearchPanel, HistoryPanel, ManagePanel, QuizPanel...
@@ -94,7 +94,8 @@ slang-dictionary/
 │   ├── main/resources/         # icon, font (nếu có)
 │   └── test/java/com/slangdict/ # unit test (JUnit 5) + PerformanceTest 100k
 ├── tools/
-│   └── GenerateBigData.java    # sinh 100.000 slang để test hiệu năng
+│   ├── ValidateData.java       # kiểm tra file dữ liệu
+│   └── GenerateBigData.java    # sinh 100.000 slang để test hiệu năng (data/slang.100k.txt, bị ignore)
 └── target/                     # (ignore) output của Maven
 ```
 
@@ -176,20 +177,20 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 ### Phase 0 — Setup
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| S1 | Tạo repo GitHub + clone về máy | M | `[ ]` | |
-| S2 | Khởi tạo Maven project (Java 17), cấu trúc package | M | `[ ]` | |
-| S3 | `.gitignore`, `README.md`, thêm `PROJECT.md` | M | `[ ]` | |
-| S4 | Cấu hình đóng gói jar chạy được (`java -jar`) | M | `[ ]` | |
+| S1 | Tạo repo GitHub + clone về máy | M | `[x]` | Repo: github.com/nguyenkhanghy/slang-dictionary |
+| S2 | Khởi tạo Maven project (Java 17), cấu trúc package | M | `[~]` | `pom.xml` + khung package đã có; chờ xác nhận `mvn clean package` chạy OK trên máy → đổi `[x]` |
+| S3 | `.gitignore`, `README.md`, thêm `PROJECT.md` | M | `[x]` | `.gitignore`, `README.md`, `PROJECT.md` đã có |
+| S4 | Cấu hình đóng gói jar chạy được (`java -jar`) | M | `[~]` | Manifest `Main-Class` + `finalName` đã cấu hình; chờ xác nhận `java -jar target/slang-dictionary.jar` → đổi `[x]` |
 
 ### Phase 1 — Data
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| D1 | Làm sạch dữ liệu → `slang.original.txt` (5 dòng mồ côi, strip khoảng trắng, bỏ dòng trùng y hệt, sửa `Æ`→`®`, `ô`→`™`, bỏ header) | M | `[ ]` | Dòng mồ côi: 413, 908, 1112, 2004, 2882. Kiểm tra bằng `tools/ValidateData.java` |
-| D2 | `SlangWord` model (slang, meanings, Serializable) | M | `[ ]` | |
-| D3 | `SlangFileReader` (bỏ header, phòng thủ dòng lỗi, log) | M | `[ ]` | |
-| D4 | `SlangFileWriter` (ghi `slang.current.txt`, UTF-8) | M | `[ ]` | |
-| D5 | `AppPaths` + logic khởi tạo file lần đầu | M | `[ ]` | |
-| D6 | Tool sinh 100.000 slang để test | M | `[ ]` | |
+| D1 | Làm sạch dữ liệu → `slang.original.txt` (5 dòng mồ côi, strip khoảng trắng, bỏ dòng trùng y hệt, sửa `Æ`→`®`, `ô`→`™`, bỏ header) | M | `[x]` | Đã commit; xác nhận bằng `ValidateData` (0 ERROR) |
+| D2 | `SlangWord` model (slang, meanings, Serializable) | M | `[x]` | `model/SlangWord`: immutable, tự kiểm tra ràng buộc định dạng |
+| D3 | `SlangFileReader` (bỏ header, phòng thủ dòng lỗi, log) | M | `[x]` | Test trên file thô: gộp 5 dòng mồ côi, bỏ header/BOM, strip; KHÔNG loại dòng trùng |
+| D4 | `SlangFileWriter` (ghi `slang.current.txt`, UTF-8) | M | `[x]` | Ghi qua file tạm + move (an toàn khi crash); nối nghĩa bằng "`| `" |
+| D5 | `AppPaths` + logic khởi tạo file lần đầu | M | `[x]` | `util/AppPaths` (property → ./data → cạnh jar) + `repository/DataBootstrap` |
+| D6 | Tool sinh 100.000 slang để test | M | `[x]` | `tools/GenerateBigData.java`; đã thử 100.000 entry |
 | D7 | `tools/ValidateData.java` kiểm tra file dữ liệu | M | `[x]` | Đã có; chạy lại sau mỗi lần sửa data |
 
 ### Phase 2 — Core search
@@ -319,6 +320,9 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | — | `slang` key không duy nhất → `Map<String, List<SlangWord>>` | Dữ liệu có 17 key trùng |
 | — | History ở file riêng `data/history.txt` | Yêu cầu GV |
 | — | Dòng lỗi sửa tay 1 lần, không dùng API | Yêu cầu GV (chạy offline) |
+| 2026-11-07 | Tìm thư mục `data/`: `-Dslang.dataDir` → `./data` (nếu có file gốc) → `data/` cạnh jar | Chạy được cả từ IDE/repo lẫn khi giảng viên chạy `java -jar` |
+| 2026-11-07 | Reader **không** loại dòng trùng; writer nối nghĩa bằng "`\| `" | F4 cho phép duplicate; khớp định dạng dữ liệu gốc |
+| 2026-11-07 | Đo thực tế: parse text 100.000 entry ≈ 0,4–0,5s | Chỉ riêng load text đã gần ngưỡng 1s → **bắt buộc** persist index (task C3) |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
 | _TBD_ | Reset có xóa history không? | Cần chốt (khuyến nghị: giữ history) |
 | _TBD_ | Có dùng FlatLaf không? | Hỏi GV về thư viện ngoài |
