@@ -21,8 +21,20 @@ Có thể chỉ định thư mục dữ liệu khác: `java -Dslang.dataDir=/duo
 |------|---------|-----|
 | `slang.original.txt` | Dữ liệu gốc đã làm sạch (chỉ đọc) | commit |
 | `slang.current.txt` | Dữ liệu đang dùng (add/edit/delete) | ignore (tự sinh) |
-| `slang.index.bin` | Index đã serialize | ignore (tự sinh) |
+| `slang.index.bin` | Index đã lưu (nhị phân) — tự build lại nếu thiếu/hỏng/lệch | ignore (tự sinh) |
 | `history.txt` | Lịch sử tìm kiếm | ignore (tự sinh) |
+
+## Chạy thử (giai đoạn phát triển)
+Hiện `Main` mở một menu console tạm thời (F1 tìm theo slang, F2 tìm theo definition, F3 history).
+Sẽ được thay bằng giao diện Swing ở Phase 5.
+
+## Kiểm tra hiệu năng (100.000 slang)
+```bash
+java tools/GenerateBigData.java            # sinh data/slang.100k.txt (1 lần, file này bị .gitignore)
+mvn clean package
+java -cp target/classes:target/test-classes com.slangdict.PerfCheck
+```
+(Windows: thay `:` bằng `;` trong classpath.) Kết quả cuối cùng phải là `RESULT: PASS`.
 
 ## Công cụ (`tools/`)
 ```bash

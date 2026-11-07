@@ -1,5 +1,7 @@
 package com.slangdict.repository;
 
+import com.slangdict.model.SlangWord;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.slangdict.model.SlangWord;
 
 /**
  * Đọc file slang (UTF-8). Định dạng mỗi dòng: {@code SLANG`meaning1| meaning2}.

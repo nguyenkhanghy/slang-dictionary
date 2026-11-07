@@ -1,11 +1,11 @@
 package com.slangdict.repository;
 
+import com.slangdict.util.AppPaths;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.slangdict.util.AppPaths;
 
 /**
  * Khởi tạo file dữ liệu cho lần chạy đầu tiên: nếu chưa có {@code slang.current.txt}

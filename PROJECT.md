@@ -84,15 +84,16 @@ slang-dictionary/
 ├── src/
 │   ├── main/java/com/slangdict/
 │   │   ├── Main.java
-│   │   ├── model/              # SlangWord (POJO, Serializable)
-│   │   ├── repository/         # đọc/ghi file: SlangFileReader, SlangFileWriter, DataBootstrap, HistoryStore, IndexStore
-│   │   ├── index/              # SlangIndex (HashMap + inverted index)
-│   │   ├── service/            # DictionaryService (logic), QuizService, HistoryService
+│   │   ├── model/              # SlangWord, HistoryEntry, SearchType
+│   │   ├── repository/         # đọc/ghi file: SlangFileReader, SlangFileWriter, DataBootstrap, IndexStore, HistoryStore, AtomicFiles
+│   │   ├── index/              # SlangIndex (HashMap + inverted index), IntList
+│   │   ├── service/            # DictionaryService (logic: tìm kiếm, history, ...), QuizService (sau)
 │   │   ├── ui/                 # MainFrame + panels: SearchPanel, HistoryPanel, ManagePanel, QuizPanel...
 │   │   │   └── components/     # component tái sử dụng, theme/style
-│   │   └── util/               # AppPaths, TextNormalizer, Logger helper
+│   │   ├── dev/                # DevConsole — menu console TẠM, xóa ở Phase 5
+│   │   └── util/               # AppPaths, TextNormalizer
 │   ├── main/resources/         # icon, font (nếu có)
-│   └── test/java/com/slangdict/ # unit test (JUnit 5) + PerformanceTest 100k
+│   └── test/java/com/slangdict/ # PerfCheck (đúng + nhanh trên 100k); unit test JUnit 5 (tùy chọn, task H2)
 ├── tools/
 │   ├── ValidateData.java       # kiểm tra file dữ liệu
 │   └── GenerateBigData.java    # sinh 100.000 slang để test hiệu năng (data/slang.100k.txt, bị ignore)
@@ -121,7 +122,8 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 
 - Định nghĩa: tách nghĩa bằng `|` → `List<String> meanings`.
 - Tìm definition nhiều từ khóa: tách token, **giao** các tập id; nếu keyword là cụm có dấu cách/ký tự đặc biệt thì lọc lại bằng `contains` trên kết quả đã thu hẹp.
-- **Persist index (R4):** serialize `SlangIndex` ra `data/slang.index.bin` (Java Serialization hoặc `DataOutputStream`). Header lưu `(size, lastModified)` của `slang.current.txt`. Khởi động: nếu khớp → load index trực tiếp; nếu lệch/thiếu/hỏng → rebuild từ txt rồi ghi lại index.
+- **Persist index (R4):** ghi `SlangIndex` (cả entries + 2 map) ra `data/slang.index.bin` bằng **định dạng nhị phân tự định nghĩa** (`DataOutputStream`; không dùng Java Serialization vì chậm với 100k object). Header: `MAGIC, VERSION, size, CRC32` của `slang.current.txt`; footer `END_MAGIC`. Khởi động: nếu khớp → nạp index trực tiếp (không đọc/parse txt); nếu lệch/thiếu/hỏng → rebuild từ txt rồi ghi lại index. Dùng CRC32 thay vì ngày sửa file vì ngày sửa bị đổi khi giải nén zip.
+- **Tìm theo definition (F2):** khớp **chuỗi con** không phân biệt hoa/thường. Quét từ vựng tìm token chứa keyword → hợp posting list → (keyword nhiều từ/có ký tự đặc biệt) kiểm tra lại bằng `contains`.
 - Add/Edit/Delete: cập nhật RAM + ghi `slang.current.txt` + cập nhật `slang.index.bin` (có thể gom ghi khi thoát app và khi đóng cửa sổ, nhưng file txt phải ghi ngay).
 
 ### 3.5 Xử lý dữ liệu lỗi (yêu cầu của GV)
@@ -178,9 +180,9 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
 | S1 | Tạo repo GitHub + clone về máy | M | `[x]` | Repo: github.com/nguyenkhanghy/slang-dictionary |
-| S2 | Khởi tạo Maven project (Java 17), cấu trúc package | M | `[~]` | `pom.xml` + khung package đã có; chờ xác nhận `mvn clean package` chạy OK trên máy → đổi `[x]` |
+| S2 | Khởi tạo Maven project (Java 17), cấu trúc package | M | `[x]` | `pom.xml` + khung package đã có; chạy `mvn clean package` thành công |
 | S3 | `.gitignore`, `README.md`, thêm `PROJECT.md` | M | `[x]` | `.gitignore`, `README.md`, `PROJECT.md` đã có |
-| S4 | Cấu hình đóng gói jar chạy được (`java -jar`) | M | `[~]` | Manifest `Main-Class` + `finalName` đã cấu hình; chờ xác nhận `java -jar target/slang-dictionary.jar` → đổi `[x]` |
+| S4 | Cấu hình đóng gói jar chạy được (`java -jar`) | M | `[x]` | Chạy `java -jar target/slang-dictionary.jar` thành công |
 
 ### Phase 1 — Data
 | ID | Task | Ưu tiên | Trạng thái | Notes |
@@ -196,13 +198,13 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 ### Phase 2 — Core search
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| C1 | `SlangIndex`: map slang → list entry | M | `[ ]` | |
-| C2 | Inverted index cho definition | M | `[ ]` | |
-| C3 | Persist/load index (`slang.index.bin`) + kiểm tra hợp lệ | M | `[ ]` | |
-| C4 | **F1** Tìm theo slang | M | `[ ]` | |
-| C5 | **F2** Tìm theo definition | M | `[ ]` | |
-| C6 | **F3** History (file `history.txt` riêng) | M | `[ ]` | |
-| C7 | Test hiệu năng 100k (< 1s, in log thời gian) | M | `[ ]` | |
+| C1 | `SlangIndex`: map slang → list entry | M | `[x]` | `index/SlangIndex.bySlang`: `Map<String, IntList>`, key = slang IN HOA |
+| C2 | Inverted index cho definition | M | `[x]` | `SlangIndex.byToken`: inverted index token → posting list (`IntList`) |
+| C3 | Persist/load index (`slang.index.bin`) + kiểm tra hợp lệ | M | `[x]` | `repository/IndexStore`: file nhị phân + kiểm tra (kích thước, CRC32); hỏng/lệch → build lại, không crash |
+| C4 | **F1** Tìm theo slang | M | `[x]` | `DictionaryService.searchBySlang` — khớp chính xác, không phân biệt hoa/thường, trả mọi entry trùng key |
+| C5 | **F2** Tìm theo definition | M | `[x]` | `DictionaryService.searchByDefinition` — khớp chuỗi con ("lov" ra "love"), đã so với duyệt tuần tự |
+| C6 | **F3** History (file `history.txt` riêng) | M | `[x]` | `HistoryStore` + `HistoryEntry`; ghi cả F1 và F2; file riêng `data/history.txt` |
+| C7 | Test hiệu năng 100k (< 1s, in log thời gian) | M | `[~]` | `src/test/.../PerfCheck` đã chạy PASS trên máy dev (truy vấn ≤ vài ms); chờ chạy trên máy thật → đổi `[x]` |
 | C8 | Gợi ý/autocomplete khi gõ (Trie hoặc `TreeMap`) | O | `[ ]` | |
 
 ### Phase 3 — CRUD
@@ -323,6 +325,10 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-07 | Tìm thư mục `data/`: `-Dslang.dataDir` → `./data` (nếu có file gốc) → `data/` cạnh jar | Chạy được cả từ IDE/repo lẫn khi giảng viên chạy `java -jar` |
 | 2026-11-07 | Reader **không** loại dòng trùng; writer nối nghĩa bằng "`\| `" | F4 cho phép duplicate; khớp định dạng dữ liệu gốc |
 | 2026-11-07 | Đo thực tế: parse text 100.000 entry ≈ 0,4–0,5s | Chỉ riêng load text đã gần ngưỡng 1s → **bắt buộc** persist index (task C3) |
+| 2026-11-07 | Index lưu bằng định dạng nhị phân tự viết; hợp lệ khi (size, CRC32) của `slang.current.txt` khớp | Nhanh hơn Java Serialization; không bị vô hiệu khi giải nén zip |
+| 2026-11-07 | F1 khớp chính xác (không phân biệt hoa/thường); F2 khớp chuỗi con | Đúng chữ "chứa keyword" trong đề; vẫn nhanh nhờ inverted index |
+
+| 2026-11-07 | Đo (100k, JVM nguội): đọc txt ~0,5s, build index ~0,5s, lưu ~0,3s, nạp cache ~0,3–0,5s; truy vấn F1/F2 ≤ vài ms | Build lại toàn bộ ≈ 1s → **Phase 3: add/edit/delete phải cập nhật index tăng dần**, ghi txt ngay, ghi index khi thoát/gom lại |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
 | _TBD_ | Reset có xóa history không? | Cần chốt (khuyến nghị: giữ history) |
 | _TBD_ | Có dùng FlatLaf không? | Hỏi GV về thư viện ngoài |
