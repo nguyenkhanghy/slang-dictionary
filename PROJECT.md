@@ -220,9 +220,9 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 ### Phase 4 — Fun
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| Q1 | **F8** Random slang of the day | M | `[ ]` | |
-| Q2 | **F9** Quiz: slang → 4 definition | M | `[ ]` | |
-| Q3 | **F10** Quiz: definition → 4 slang | M | `[ ]` | |
+| Q1 | **F8** Random slang of the day | M | `[x]` | |
+| Q2 | **F9** Quiz: slang → 4 definition | M | `[x]` | |
+| Q3 | **F10** Quiz: definition → 4 slang | M | `[x]` | |
 | Q4 | Điểm số, streak, kết quả cuối quiz | O | `[ ]` | |
 | Q5 | Slang of the day cố định theo ngày (seed = ngày) | O | `[ ]` | |
 

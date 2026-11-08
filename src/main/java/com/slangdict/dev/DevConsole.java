@@ -7,6 +7,8 @@ import com.slangdict.service.DictionaryService;
 import com.slangdict.service.DuplicatePolicy;
 import com.slangdict.service.EditResult;
 import com.slangdict.service.InputValidator;
+import com.slangdict.service.QuizQuestion;
+import com.slangdict.service.QuizService;
 import com.slangdict.service.ValidationException;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -28,11 +31,13 @@ public final class DevConsole {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
 
     private final DictionaryService service;
+    private final QuizService quiz;
     private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     private final Scanner in = new Scanner(System.in, StandardCharsets.UTF_8);
 
     private DevConsole(DictionaryService service) {
         this.service = service;
+        this.quiz = new QuizService(service);
     }
 
     /** Chạy menu cho tới khi thoát; luôn gọi {@code service.close()} khi kết thúc. */
@@ -52,6 +57,8 @@ public final class DevConsole {
             out.println("2. Search by definition      6. Edit slang");
             out.println("3. Show history              7. Delete slang");
             out.println("4. Clear history             8. Reset to original data");
+            out.println("9. Random slang              10. Quiz: slang -> meaning");
+            out.println("11. Quiz: meaning -> slang");
             out.println("0. Exit");
             String choice = ask("Choose: ");
             if (choice == null) {
@@ -70,6 +77,9 @@ public final class DevConsole {
                     case "6" -> edit();
                     case "7" -> delete();
                     case "8" -> reset();
+                    case "9" -> randomSlang();
+                    case "10" -> playQuiz(quiz.nextSlangToMeaningQuestion());
+                    case "11" -> playQuiz(quiz.nextMeaningToSlangQuestion());
                     case "0" -> {
                         return;
                     }
@@ -139,6 +149,32 @@ public final class DevConsole {
         }
         service.resetToOriginal();
         out.println("Reset done. Entries: " + service.size());
+    }
+
+    private void randomSlang() {
+        quiz.randomSlang().ifPresentOrElse(
+                w -> out.println("Slang of the day: " + w.getSlang() + "  ->  " + QuizService.meaningText(w)),
+                () -> out.println("No data."));
+    }
+
+    private void playQuiz(Optional<QuizQuestion> question) {
+        if (question.isEmpty()) {
+            out.println("Not enough data to build a quiz (need at least 4 clearly different entries).");
+            return;
+        }
+        QuizQuestion q = question.get();
+        out.println("Question: " + q.prompt());
+        for (int i = 0; i < q.options().size(); i++) {
+            out.println("  " + (i + 1) + ". " + q.options().get(i));
+        }
+        String answer = askOrEmpty("Your answer (1-" + q.options().size() + "): ").strip();
+        int choice;
+        try {
+            choice = Integer.parseInt(answer) - 1;
+        } catch (NumberFormatException e) {
+            choice = -1;
+        }
+        out.println(q.isCorrect(choice) ? "Correct!" : "Wrong. Correct answer: " + (q.correctIndex() + 1) + ". " + q.correctOption());
     }
 
     private void showHistory() {

@@ -33,8 +33,10 @@ Sẽ được thay bằng giao diện Swing ở Phase 5.
 java tools/GenerateBigData.java            # sinh data/slang.100k.txt (1 lần, file này bị .gitignore)
 mvn clean package
 java -cp target/classes:target/test-classes com.slangdict.PerfCheck
+java -cp target/classes:target/test-classes com.slangdict.MutationCheck
+java -cp target/classes:target/test-classes com.slangdict.QuizCheck
 ```
-(Windows: thay `:` bằng `;` trong classpath.) Kết quả cuối cùng phải là `RESULT: PASS`.
+(Windows: thay `:` bằng `;` trong classpath.) Tất cả bài test phải in ra `RESULT: PASS`.
 
 ## Kiểm tra chức năng ghi (add/edit/delete/reset)
 ```bash
