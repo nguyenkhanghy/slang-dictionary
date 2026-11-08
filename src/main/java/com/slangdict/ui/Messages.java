@@ -161,6 +161,69 @@ public final class Messages {
         return NumberFormat.getIntegerInstance(VIETNAMESE).format(count) + " kết quả";
     }
 
+    // ------------------------------------------------------------------ chung cho các màn U4
+
+    public static final String UNEXPECTED_ERROR_DETAIL =
+            "Đã xảy ra lỗi bất ngờ. Bạn hãy thử lại; nếu lỗi vẫn còn, hãy đóng và mở lại ứng dụng.";
+
+    // ------------------------------------------------------------------ màn từ lóng ngẫu nhiên (F8)
+
+    public static final String RANDOM_BUTTON = "Từ khác";
+    public static final String RANDOM_LABEL_SLANG = "Từ lóng";
+    public static final String RANDOM_LABEL_MEANING = "Nghĩa";
+    public static final String RANDOM_EMPTY_TITLE = "Từ điển đang trống";
+    public static final String RANDOM_ERROR_TITLE = "Không thể chọn từ ngẫu nhiên";
+
+    public static String randomEmptyDetail() {
+        return "Hãy thêm từ lóng ở mục “" + navLabel(Page.ADD) + "” hoặc khôi phục dữ liệu gốc.";
+    }
+
+    // ------------------------------------------------------------------ màn lịch sử tìm kiếm (F3)
+
+    public static final String HISTORY_CLEAR_BUTTON = "Xóa lịch sử";
+    public static final String HISTORY_TIME_PATTERN = "dd/MM/yyyy HH:mm";
+    public static final String COLUMN_TIME = "Thời gian";
+    public static final String COLUMN_TYPE = "Loại";
+    public static final String COLUMN_QUERY = "Từ khóa";
+    public static final String HISTORY_EMPTY_TITLE = "Chưa có lịch sử tìm kiếm";
+    public static final String HISTORY_ERROR_TITLE = "Không thể tải lịch sử tìm kiếm";
+    public static final String HISTORY_CONFIRM_TITLE = "Xóa lịch sử tìm kiếm";
+    public static final String HISTORY_CONFIRM_MESSAGE =
+            "Bạn có chắc muốn xóa toàn bộ lịch sử tìm kiếm? Thao tác này không thể hoàn tác.";
+    public static final String HISTORY_CONFIRM_YES = "Xóa";
+    public static final String HISTORY_CONFIRM_NO = "Hủy";
+
+    public static String historyEmptyDetail() {
+        return "Các lần tìm ở mục “" + navLabel(Page.SEARCH_SLANG) + "” và “" + navLabel(Page.SEARCH_DEFINITION)
+                + "” sẽ hiện ở đây.";
+    }
+
+    public static String historyType(SearchType type) {
+        return switch (type) {
+            case SLANG -> "Theo từ lóng";
+            case DEFINITION -> "Theo nghĩa";
+        };
+    }
+
+    public static String historyCount(int count) {
+        return NumberFormat.getIntegerInstance(VIETNAMESE).format(count) + " lần tìm";
+    }
+
+    // ------------------------------------------------------------------ màn trắc nghiệm (F9, F10)
+
+    public static final String QUIZ_NEXT_BUTTON = "Câu tiếp theo";
+    public static final String QUIZ_CAPTION_SLANG = "Từ lóng";
+    public static final String QUIZ_CAPTION_MEANING = "Nghĩa";
+    public static final String QUIZ_CORRECT = "Chính xác!";
+    public static final String QUIZ_WRONG = "Chưa đúng. Đáp án đúng được tô màu xanh.";
+    public static final String QUIZ_EMPTY_TITLE = "Chưa đủ dữ liệu để ra câu hỏi";
+    public static final String QUIZ_ERROR_TITLE = "Không thể tạo câu hỏi";
+
+    public static String quizEmptyDetail() {
+        return "Cần ít nhất bốn từ lóng có nghĩa khác nhau. Hãy thêm từ lóng ở mục “" + navLabel(Page.ADD)
+                + "” hoặc khôi phục dữ liệu gốc.";
+    }
+
     /** Rút gọn từ khóa người dùng nhập để thông báo không bị dài quá khổ. */
     private static String preview(String query) {
         String text = query.strip();

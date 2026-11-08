@@ -59,6 +59,10 @@ public final class Theme {
     /** Viền ô nhập; đổi sang màu nhấn khi ô đang có focus. */
     public static final Color INPUT_BORDER = BORDER;
     public static final Color INPUT_BORDER_FOCUS = ACCENT;
+    /** Màu báo đúng / sai (viền, nền nhạt, chữ) trong màn trắc nghiệm. */
+    public static final Color SUCCESS = new Color(0x15803D);
+    public static final Color SUCCESS_SOFT = new Color(0xE7F6EC);
+    public static final Color DANGER_SOFT = new Color(0xFDECEA);
 
     // ------------------------------------------------------------------ khoảng cách và kích thước (px logic)
 
@@ -84,6 +88,14 @@ public final class Theme {
     public static final int TABLE_CELL_PAD_Y = 10;
     /** Chiều rộng cố định của cột "Từ lóng"; cột "Nghĩa" lấy phần còn lại. */
     public static final int TABLE_SLANG_COLUMN_WIDTH = 180;
+    /** Bề rộng cố định của cột thời gian và cột loại trong bảng lịch sử; cột từ khóa lấy phần còn lại. */
+    public static final int HISTORY_TIME_COLUMN_WIDTH = 170;
+    public static final int HISTORY_TYPE_COLUMN_WIDTH = 130;
+    /** Màn trắc nghiệm: bề rộng nội dung (câu hỏi, đáp án; vừa thẻ ở cỡ cửa sổ tối thiểu), lề và cỡ huy hiệu A/B/C/D. */
+    public static final int QUIZ_CONTENT_WIDTH = 440;
+    public static final int QUIZ_OPTION_PAD_X = 16;
+    public static final int QUIZ_OPTION_PAD_Y = 12;
+    public static final int QUIZ_BADGE_SIZE = 26;
 
     /** Kích thước mặc định của cửa sổ chính (quyết định Q5): 1000x680. */
     public static Dimension windowDefaultSize() {
