@@ -229,8 +229,8 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 ### Phase 5 — GUI
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| U1 | Quyết định look&feel (Nimbus / FlatLaf) | M | `[ ]` | Hỏi GV nếu dùng thư viện ngoài |
-| U2 | `MainFrame` + sidebar/tab điều hướng 10 chức năng | M | `[ ]` | |
+| U1 | Quyết định look&feel (Nimbus / FlatLaf) | M | `[x]` | |
+| U2 | `MainFrame` + sidebar/tab điều hướng 10 chức năng | M | `[x]` | |
 | U3 | Màn Search (slang + definition, kết quả dạng bảng/card) | M | `[ ]` | |
 | U4 | Màn History, Manage (Add/Edit/Delete), Quiz, Random | M | `[ ]` | |
 | U5 | Dialog confirm/thông báo thống nhất | M | `[ ]` | |
@@ -333,5 +333,7 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-08 | Overwrite thay tất cả entry cùng key bằng 1 entry mới đặt tại vị trí đầu | Đơn giản hóa UI F4/F5 |
 | 2026-11-08 | Reset danh sách về gốc nhưng **GIỮ LẠI history** | History là hành vi người dùng, không thuộc data gốc |
 | 2026-11-08 | Thao tác ghi sẽ chép đè nguyên file `slang.current.txt` thay vì append | Đo thực tế chỉ mất 15-140ms ở 100k, đủ nhanh không cần append phức tạp |
+| 2026-11-08 | Không dùng FlatLaf, dùng Nimbus + Theme tự vẽ | Không phụ thuộc thư viện ngoài |
+| 2026-11-08 | Ngôn ngữ UI là Tiếng Việt, dùng Sidebar trái, Theme sáng, màu Blue | Dễ dùng, trực quan, nhất quán |
+| 2026-11-08 | Kích thước GUI mặc định 1000x680, tối thiểu 820x560 | Tối ưu trải nghiệm người dùng |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
-| _TBD_ | Có dùng FlatLaf không? | Hỏi GV về thư viện ngoài |
