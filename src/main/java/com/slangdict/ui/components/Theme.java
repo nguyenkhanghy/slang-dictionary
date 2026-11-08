@@ -52,6 +52,14 @@ public final class Theme {
     public static final Color SCROLL_THUMB = new Color(0xC3CBD9);
     public static final Color SCROLL_THUMB_HOVER = new Color(0x97A3B8);
 
+    /** Chữ báo lỗi (thông báo lỗi bất ngờ). */
+    public static final Color DANGER = new Color(0xB42318);
+    /** Nền dòng đang chọn trong bảng kết quả. */
+    public static final Color TABLE_ROW_SELECTED = ACCENT_SOFT;
+    /** Viền ô nhập; đổi sang màu nhấn khi ô đang có focus. */
+    public static final Color INPUT_BORDER = BORDER;
+    public static final Color INPUT_BORDER_FOCUS = ACCENT;
+
     // ------------------------------------------------------------------ khoảng cách và kích thước (px logic)
 
     public static final int SPACE_XS = 4;
@@ -65,6 +73,17 @@ public final class Theme {
     public static final int NAV_ITEM_HEIGHT = 36;
     /** Chiều rộng tối đa của một đoạn văn (giữ dòng chữ dễ đọc, dưới ~80 ký tự). */
     public static final int TEXT_MAX_WIDTH = 480;
+    /** Chiều rộng tối đa của chữ trong thẻ trạng thái (nhỏ hơn TEXT_MAX_WIDTH để vừa thẻ ở cỡ cửa sổ tối thiểu). */
+    public static final int STATE_TEXT_MAX_WIDTH = 420;
+    /** Chiều cao ô nhập và nút hành động đi kèm. */
+    public static final int INPUT_HEIGHT = 44;
+    public static final int TABLE_HEADER_HEIGHT = 40;
+    /** Chiều cao tối thiểu của một hàng trong bảng kết quả (hàng nhiều dòng sẽ cao hơn). */
+    public static final int TABLE_ROW_MIN_HEIGHT = 40;
+    public static final int TABLE_CELL_PAD_X = 12;
+    public static final int TABLE_CELL_PAD_Y = 10;
+    /** Chiều rộng cố định của cột "Từ lóng"; cột "Nghĩa" lấy phần còn lại. */
+    public static final int TABLE_SLANG_COLUMN_WIDTH = 180;
 
     /** Kích thước mặc định của cửa sổ chính (quyết định Q5): 1000x680. */
     public static Dimension windowDefaultSize() {
@@ -89,6 +108,7 @@ public final class Theme {
     private static final String FONT_FAMILY = resolveFamily();
 
     public static final Font FONT_BODY = new Font(FONT_FAMILY, Font.PLAIN, 14);
+    public static final Font FONT_BODY_BOLD = new Font(FONT_FAMILY, Font.BOLD, 14);
     public static final Font FONT_SMALL = new Font(FONT_FAMILY, Font.PLAIN, 12);
     public static final Font FONT_NAV = new Font(FONT_FAMILY, Font.PLAIN, 14);
     public static final Font FONT_TITLE = new Font(FONT_FAMILY, Font.BOLD, 28);

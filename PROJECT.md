@@ -231,8 +231,10 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 |----|------|:------:|:---------:|-------|
 | U1 | Quyết định look&feel (Nimbus / FlatLaf) | M | `[x]` | |
 | U2 | `MainFrame` + sidebar/tab điều hướng 10 chức năng | M | `[x]` | |
-| U3 | Màn Search (slang + definition, kết quả dạng bảng/card) | M | `[ ]` | |
-| U4 | Màn History, Manage (Add/Edit/Delete), Quiz, Random | M | `[ ]` | |
+| U3 | Màn Search (slang + definition, kết quả dạng bảng/card) | M | `[x]` | |
+| U4a | Màn History (F3) + Random (F8) | M | `[ ]` | |
+| U4b | Màn Quiz (F9 + F10) | M | `[ ]` | |
+| U4c | Màn Quản lý: Add/Edit/Delete/Reset | M | `[ ]` | |
 | U5 | Dialog confirm/thông báo thống nhất | M | `[ ]` | |
 | U6 | Theme (màu, font, icon), spacing nhất quán | M | `[ ]` | |
 | U7 | Dark mode / đổi theme | O | `[ ]` | |
@@ -336,4 +338,9 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-08 | Không dùng FlatLaf, dùng Nimbus + Theme tự vẽ | Không phụ thuộc thư viện ngoài |
 | 2026-11-08 | Ngôn ngữ UI là Tiếng Việt, dùng Sidebar trái, Theme sáng, màu Blue | Dễ dùng, trực quan, nhất quán |
 | 2026-11-08 | Kích thước GUI mặc định 1000x680, tối thiểu 820x560 | Tối ưu trải nghiệm người dùng |
+| 2026-11-08 | Màn Search: bảng hai cột "Từ lóng | Nghĩa", hàng co theo nghĩa, hiện TẤT CẢ kết quả. | Yêu cầu của đề là không giới hạn kết quả |
+| 2026-11-08 | Tìm kiếm chạy bằng `SwingWorker` đẩy vào `ServiceExecutor`. | Đảm bảo UI không đơ; Service không thread-safe |
+| 2026-11-08 | Kích hoạt tìm: Enter hoặc nút "Tìm" (không tìm-khi-gõ). | Không làm rác file history |
+| 2026-11-08 | Nút × xóa nhanh đưa về trạng thái "chưa tìm". | Thân thiện với người dùng, không ghi history |
+| 2026-11-08 | Không chuyển thẳng từ Search sang Add/Edit/Delete ở U3. | Giao diện quản lý sẽ được tách làm riêng ở U4c |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |

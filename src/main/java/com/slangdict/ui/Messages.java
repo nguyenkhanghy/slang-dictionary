@@ -1,5 +1,7 @@
 package com.slangdict.ui;
 
+import com.slangdict.model.SearchType;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -97,4 +99,74 @@ public final class Messages {
     }
 
     public static final String PLACEHOLDER_STATUS = "Màn hình này đang được xây dựng.";
+
+    // ------------------------------------------------------------------ màn tìm kiếm (F1, F2)
+
+    /** Số ký tự tối đa của từ khóa được trích lại trong thông báo (từ khóa dài bị cắt bằng "…"). */
+    private static final int QUERY_PREVIEW_LENGTH = 24;
+
+    public static final String SEARCH_BUTTON = "Tìm";
+    public static final String SEARCH_CLEAR = "Xóa nội dung đã nhập";
+    public static final String COLUMN_SLANG = "Từ lóng";
+    public static final String COLUMN_MEANING = "Nghĩa";
+
+    public static final String SEARCH_ERROR_TITLE = "Không thể thực hiện tìm kiếm";
+    public static final String SEARCH_ERROR_DETAIL =
+            "Đã xảy ra lỗi bất ngờ. Bạn hãy thử lại; nếu lỗi vẫn còn, hãy đóng và mở lại ứng dụng.";
+
+    public static String searchPlaceholder(SearchType type) {
+        return switch (type) {
+            case SLANG -> "Nhập từ lóng cần tra…";
+            case DEFINITION -> "Nhập từ khóa trong nghĩa, ví dụ: love";
+        };
+    }
+
+    public static String searchIdleTitle(SearchType type) {
+        return switch (type) {
+            case SLANG -> "Chưa tra từ nào";
+            case DEFINITION -> "Chưa tìm từ khóa nào";
+        };
+    }
+
+    public static String searchIdleDetail(SearchType type) {
+        return switch (type) {
+            case SLANG -> "Nhập một từ lóng vào ô phía trên, rồi nhấn Enter hoặc nút Tìm.";
+            case DEFINITION -> "Nhập một từ khóa vào ô phía trên, rồi nhấn Enter hoặc nút Tìm "
+                    + "để xem mọi từ lóng có nghĩa chứa từ khóa đó.";
+        };
+    }
+
+    public static final String SEARCH_EMPTY_INPUT_TITLE = "Ô tìm kiếm đang trống";
+    public static final String SEARCH_EMPTY_INPUT_DETAIL = "Hãy nhập nội dung cần tìm, rồi nhấn Enter hoặc nút Tìm.";
+
+    public static String searchingTitle(String query) {
+        return "Đang tìm “" + preview(query) + "”…";
+    }
+
+    public static final String SEARCHING_DETAIL = "Vui lòng chờ một chút.";
+
+    public static String notFoundTitle(String query) {
+        return "Không tìm thấy kết quả cho “" + preview(query) + "”";
+    }
+
+    public static String notFoundDetail(SearchType type) {
+        return switch (type) {
+            case SLANG -> "Hãy kiểm tra lại chính tả, hoặc thử tìm theo nghĩa ở mục “"
+                    + navLabel(Page.SEARCH_DEFINITION) + "”.";
+            case DEFINITION -> "Hãy thử một từ khóa ngắn hơn hoặc một từ khác.";
+        };
+    }
+
+    public static String resultCount(int count) {
+        return NumberFormat.getIntegerInstance(VIETNAMESE).format(count) + " kết quả";
+    }
+
+    /** Rút gọn từ khóa người dùng nhập để thông báo không bị dài quá khổ. */
+    private static String preview(String query) {
+        String text = query.strip();
+        if (text.codePointCount(0, text.length()) <= QUERY_PREVIEW_LENGTH) {
+            return text;
+        }
+        return text.substring(0, text.offsetByCodePoints(0, QUERY_PREVIEW_LENGTH)) + "…";
+    }
 }

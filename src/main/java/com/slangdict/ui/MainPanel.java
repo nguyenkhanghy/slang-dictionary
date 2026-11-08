@@ -18,7 +18,7 @@ final class MainPanel extends JPanel {
         JPanel content = new JPanel(cards);
         content.setBackground(Theme.BACKGROUND);
         for (Page page : Page.values()) {
-            content.add(PageFactory.create(page), page.name());
+            content.add(PageFactory.create(page, service), page.name());
         }
 
         NavSidebar sidebar = new NavSidebar(
