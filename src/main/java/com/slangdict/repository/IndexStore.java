@@ -1,5 +1,7 @@
 package com.slangdict.repository;
 
+import com.slangdict.index.SlangIndex;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -11,8 +13,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
-
-import com.slangdict.index.SlangIndex;
 
 /**
  * Lưu/nạp index ra file nhị phân để các lần chạy sau KHÔNG phải index lại (yêu cầu R4).

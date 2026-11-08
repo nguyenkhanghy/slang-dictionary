@@ -25,7 +25,7 @@ Có thể chỉ định thư mục dữ liệu khác: `java -Dslang.dataDir=/duo
 | `history.txt` | Lịch sử tìm kiếm | ignore (tự sinh) |
 
 ## Chạy thử (giai đoạn phát triển)
-Hiện `Main` mở một menu console tạm thời (F1 tìm theo slang, F2 tìm theo definition, F3 history).
+Hiện `Main` mở một menu console tạm thời: F1 tìm theo slang, F2 tìm theo definition, F3 history, add, edit, delete, reset. Thoát bằng mục `0` để index được lưu (kể cả Ctrl+C vẫn được lưu).
 Sẽ được thay bằng giao diện Swing ở Phase 5.
 
 ## Kiểm tra hiệu năng (100.000 slang)
@@ -35,6 +35,12 @@ mvn clean package
 java -cp target/classes:target/test-classes com.slangdict.PerfCheck
 ```
 (Windows: thay `:` bằng `;` trong classpath.) Kết quả cuối cùng phải là `RESULT: PASS`.
+
+## Kiểm tra chức năng ghi (add/edit/delete/reset)
+```bash
+java -cp target/classes:target/test-classes com.slangdict.MutationCheck   # chạy trên bản sao trong target/, không đụng data/
+```
+Phải ra `RESULT: PASS`.
 
 ## Công cụ (`tools/`)
 ```bash

@@ -204,17 +204,17 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | C4 | **F1** Tìm theo slang | M | `[x]` | `DictionaryService.searchBySlang` — khớp chính xác, không phân biệt hoa/thường, trả mọi entry trùng key |
 | C5 | **F2** Tìm theo definition | M | `[x]` | `DictionaryService.searchByDefinition` — khớp chuỗi con ("lov" ra "love"), đã so với duyệt tuần tự |
 | C6 | **F3** History (file `history.txt` riêng) | M | `[x]` | `HistoryStore` + `HistoryEntry`; ghi cả F1 và F2; file riêng `data/history.txt` |
-| C7 | Test hiệu năng 100k (< 1s, in log thời gian) | M | `[~]` | `src/test/.../PerfCheck` đã chạy PASS trên máy dev (truy vấn ≤ vài ms); chờ chạy trên máy thật → đổi `[x]` |
+| C7 | Test hiệu năng 100k (< 1s, in log thời gian) | M | `[x]` | `src/test/.../PerfCheck` đã chạy PASS trên máy dev (truy vấn ≤ vài ms) |
 | C8 | Gợi ý/autocomplete khi gõ (Trie hoặc `TreeMap`) | O | `[ ]` | |
 
 ### Phase 3 — CRUD
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| E1 | **F4** Add + xử lý trùng (Overwrite / Duplicate) | M | `[ ]` | |
-| E2 | **F5** Edit | M | `[ ]` | |
-| E3 | **F6** Delete + confirm | M | `[ ]` | |
-| E4 | **F7** Reset về original | M | `[ ]` | |
-| E5 | Validate input (rỗng, ký tự `` ` `` và xuống dòng bị cấm trong slang/meaning) | M | `[ ]` | |
+| E1 | **F4** Add + xử lý trùng (Overwrite / Duplicate) | M | `[x]` | `DictionaryService.addSlang` + `DuplicatePolicy`/`AddResult`; test: `MutationCheck` |
+| E2 | **F5** Edit | M | `[x]` | `editSlang` + `EditResult` (đổi key trùng key khác → CONFLICT) |
+| E3 | **F6** Delete + confirm | M | `[x]` | `deleteSlang`; `SlangIndex.removeAt` giữ nguyên thứ tự entry còn lại |
+| E4 | **F7** Reset về original | M | `[x]` | `resetToOriginal` (copy nguyên byte file gốc, giữ history) |
+| E5 | Validate input | M | `[x]` | `service/InputValidator` + `ValidationException` (có `getReason()`) |
 | E6 | Undo thao tác xóa gần nhất | O | `[ ]` | |
 
 ### Phase 4 — Fun
@@ -329,6 +329,9 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-07 | F1 khớp chính xác (không phân biệt hoa/thường); F2 khớp chuỗi con | Đúng chữ "chứa keyword" trong đề; vẫn nhanh nhờ inverted index |
 
 | 2026-11-07 | Đo (100k, JVM nguội): đọc txt ~0,5s, build index ~0,5s, lưu ~0,3s, nạp cache ~0,3–0,5s; truy vấn F1/F2 ≤ vài ms | Build lại toàn bộ ≈ 1s → **Phase 3: add/edit/delete phải cập nhật index tăng dần**, ghi txt ngay, ghi index khi thoát/gom lại |
+| 2026-11-08 | Ghi txt trước, đổi RAM sau; index lưu ở `close()` | Ghi file lỗi thì RAM không đổi (an toàn dữ liệu) |
+| 2026-11-08 | Overwrite thay tất cả entry cùng key bằng 1 entry mới đặt tại vị trí đầu | Đơn giản hóa UI F4/F5 |
+| 2026-11-08 | Reset danh sách về gốc nhưng **GIỮ LẠI history** | History là hành vi người dùng, không thuộc data gốc |
+| 2026-11-08 | Thao tác ghi sẽ chép đè nguyên file `slang.current.txt` thay vì append | Đo thực tế chỉ mất 15-140ms ở 100k, đủ nhanh không cần append phức tạp |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
-| _TBD_ | Reset có xóa history không? | Cần chốt (khuyến nghị: giữ history) |
 | _TBD_ | Có dùng FlatLaf không? | Hỏi GV về thư viện ngoài |

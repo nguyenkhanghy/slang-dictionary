@@ -1,5 +1,8 @@
 package com.slangdict.index;
 
+import com.slangdict.model.SlangWord;
+import com.slangdict.util.TextNormalizer;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,9 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import com.slangdict.model.SlangWord;
-import com.slangdict.util.TextNormalizer;
 
 /**
  * Cấu trúc dữ liệu chính trong RAM (xem PROJECT.md mục 3.4).
@@ -29,8 +29,8 @@ import com.slangdict.util.TextNormalizer;
  * Cách làm: quét từ vựng (vài chục nghìn token) tìm token chứa keyword, hợp các posting list; keyword nhiều
  * từ thì giao các tập; cuối cùng kiểm tra lại bằng contains khi keyword có ký tự ngoài chữ/số hoặc nhiều từ.
  *
- * <p>Lớp này không thread-safe và (ở Phase 2) chỉ đọc. Có thể ghi/đọc dạng nhị phân qua
- * {@link #writeTo} / {@link #readFrom}.
+ * <p>Hỗ trợ cập nhật tăng dần ({@link #add}, {@link #replaceAt}, {@link #removeAt}) để không phải build lại
+ * toàn bộ khi add/edit/delete. Không thread-safe. Có thể ghi/đọc dạng nhị phân qua {@link #writeTo} / {@link #readFrom}.
  */
 public final class SlangIndex {
 
@@ -53,16 +53,11 @@ public final class SlangIndex {
         List<SlangWord> entries = new ArrayList<>(words);
         Map<String, IntList> bySlang = new HashMap<>(capacityFor(entries.size()));
         Map<String, IntList> byToken = new HashMap<>(capacityFor(entries.size() / 2));
+        SlangIndex index = new SlangIndex(entries, bySlang, byToken);
         for (int id = 0; id < entries.size(); id++) {
-            SlangWord word = entries.get(id);
-            bySlang.computeIfAbsent(TextNormalizer.normalizeSlang(word.getSlang()), k -> new IntList()).add(id);
-            for (String meaning : word.getMeanings()) {
-                for (String token : TextNormalizer.tokenize(TextNormalizer.normalizeText(meaning))) {
-                    byToken.computeIfAbsent(token, k -> new IntList()).add(id);
-                }
-            }
+            index.indexEntry(id, entries.get(id));
         }
-        return new SlangIndex(entries, bySlang, byToken);
+        return index;
     }
 
     // ------------------------------------------------------------------ queries
@@ -151,6 +146,103 @@ public final class SlangIndex {
             }
         }
         return false;
+    }
+
+    // ------------------------------------------------------------------ mutations (cập nhật tăng dần)
+
+    /** Thêm entry vào cuối; trả về id mới (= size trước khi thêm). */
+    public int add(SlangWord word) {
+        int id = entries.size();
+        entries.add(word);
+        indexEntry(id, word);
+        return id;
+    }
+
+    /** Thay entry tại {@code id} bằng {@code word} (giữ nguyên vị trí). Trả về entry cũ. */
+    public SlangWord replaceAt(int id, SlangWord word) {
+        SlangWord old = entries.get(id);
+        unindexEntry(id, old);
+        entries.set(id, word);
+        indexEntry(id, word);
+        return old;
+    }
+
+    /**
+     * Xóa entry tại {@code id}, GIỮ NGUYÊN thứ tự các entry còn lại: id lớn hơn bị dồn xuống 1 trong mọi
+     * posting list (O(tổng số posting), không phải build lại). Trả về entry đã xóa.
+     */
+    public SlangWord removeAt(int id) {
+        SlangWord removed = entries.get(id);
+        unindexEntry(id, removed);
+        entries.remove(id);
+        for (IntList ids : bySlang.values()) {
+            ids.decrementAbove(id);
+        }
+        for (IntList ids : byToken.values()) {
+            ids.decrementAbove(id);
+        }
+        return removed;
+    }
+
+    /** Các id (tăng dần) của mọi entry có slang trùng khóa (không phân biệt hoa/thường). Rỗng nếu không có. */
+    public int[] findIdsBySlang(String slang) {
+        if (slang == null || slang.isBlank()) {
+            return new int[0];
+        }
+        IntList ids = bySlang.get(TextNormalizer.normalizeSlang(slang));
+        if (ids == null) {
+            return new int[0];
+        }
+        int[] result = new int[ids.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = ids.get(i);
+        }
+        return result;
+    }
+
+    /** Id của entry: ưu tiên cùng đối tượng, nếu không thì entry đầu tiên bằng giá trị. -1 nếu không có. */
+    public int findId(SlangWord word) {
+        IntList ids = bySlang.get(TextNormalizer.normalizeSlang(word.getSlang()));
+        if (ids == null) {
+            return -1;
+        }
+        for (int i = 0; i < ids.size(); i++) {
+            if (entries.get(ids.get(i)) == word) {
+                return ids.get(i);
+            }
+        }
+        for (int i = 0; i < ids.size(); i++) {
+            if (entries.get(ids.get(i)).equals(word)) {
+                return ids.get(i);
+            }
+        }
+        return -1;
+    }
+
+    private void indexEntry(int id, SlangWord word) {
+        bySlang.computeIfAbsent(TextNormalizer.normalizeSlang(word.getSlang()), k -> new IntList()).insert(id);
+        for (String meaning : word.getMeanings()) {
+            for (String token : TextNormalizer.tokenize(TextNormalizer.normalizeText(meaning))) {
+                byToken.computeIfAbsent(token, k -> new IntList()).insert(id);
+            }
+        }
+    }
+
+    private void unindexEntry(int id, SlangWord word) {
+        removeFrom(bySlang, TextNormalizer.normalizeSlang(word.getSlang()), id);
+        for (String meaning : word.getMeanings()) {
+            for (String token : TextNormalizer.tokenize(TextNormalizer.normalizeText(meaning))) {
+                removeFrom(byToken, token, id);
+            }
+        }
+    }
+
+    /** Gỡ id khỏi posting list của key; list rỗng thì xóa luôn key để map không phình ra. */
+    private static void removeFrom(Map<String, IntList> map, String key, int id) {
+        IntList ids = map.get(key);
+        if (ids != null && ids.remove(id) && ids.isEmpty()) {
+            map.remove(key);
+        }
     }
 
     // ------------------------------------------------------------------ persistence (binary)

@@ -1,5 +1,8 @@
 package com.slangdict.repository;
 
+import com.slangdict.model.HistoryEntry;
+import com.slangdict.model.SearchType;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -11,9 +14,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.slangdict.model.HistoryEntry;
-import com.slangdict.model.SearchType;
 
 /**
  * Lưu history tìm kiếm vào MỘT FILE RIÊNG (yêu cầu của GV), tách khỏi file dữ liệu slang.

@@ -1,5 +1,11 @@
 package com.slangdict;
 
+import com.slangdict.model.SlangWord;
+import com.slangdict.repository.SlangFileReader;
+import com.slangdict.service.DictionaryService;
+import com.slangdict.service.DuplicatePolicy;
+import com.slangdict.util.TextNormalizer;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,11 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Stream;
-
-import com.slangdict.model.SlangWord;
-import com.slangdict.repository.SlangFileReader;
-import com.slangdict.service.DictionaryService;
-import com.slangdict.util.TextNormalizer;
 
 /**
  * Kiểm tra ĐÚNG và NHANH của Phase 2 trên bộ dữ liệu lớn (task C7). Không cần JUnit.
@@ -25,7 +26,7 @@ import com.slangdict.util.TextNormalizer;
  * </pre>
  *
  * Dữ liệu được copy vào target/perf-data nên không đụng tới thư mục data/ thật.
- * Mọi truy vấn phải < 1000 ms; thoát mã 1 nếu sai kết quả hoặc quá chậm.
+ * Gồm cả đo thời gian các thao tác ghi (add/edit/delete) ở 100k. Mọi thao tác phải < 1000 ms; thoát mã 1 nếu sai kết quả hoặc quá chậm.
  */
 public class PerfCheck {
 
@@ -133,6 +134,21 @@ public class PerfCheck {
             track(worst, "F2 '" + kw + "'");
         }
 
+        // 5. thao tác ghi (add/edit/delete) ở kích thước lớn: mỗi thao tác gồm cả việc ghi lại slang.current.txt
+        System.out.println();
+        System.out.println("Modifications at " + words.size() + " entries (each includes rewriting slang.current.txt):");
+        int base = words.size() / 3;
+        timeWrite("add new key", 5, i -> fresh.addSlang("PERFADD" + i, List.of("perf test meaning " + i), DuplicatePolicy.REJECT));
+        timeWrite("add duplicate key", 5, i -> fresh.addSlang(words.get(base + i).getSlang(), List.of("dup meaning " + i), DuplicatePolicy.DUPLICATE));
+        timeWrite("overwrite key", 5, i -> fresh.addSlang(words.get(base + 10 + i).getSlang(), List.of("over meaning " + i), DuplicatePolicy.OVERWRITE));
+        timeWrite("edit", 5, i -> { SlangWord t = fresh.getAllWords().get(base + 20 + i); fresh.editSlang(t, t.getSlang(), List.of("edited meaning " + i)); });
+        timeWrite("delete", 5, i -> fresh.deleteSlang(fresh.getAllWords().get(base + 30 + i)));
+        long closeStart = System.nanoTime();
+        fresh.close();
+        System.out.printf("%-18s %9s %9.2f %9s   (index save on exit; info only)%n", "close()", "", ms(closeStart), "");
+        check("file equals memory after modifications", SlangFileReader.read(dir.resolve("slang.current.txt")).equals(fresh.getAllWords()));
+        check("reopen after close uses cache", DictionaryService.open().isIndexFromCache());
+
         System.out.println();
         System.out.printf("Worst single operation: %.2f ms (limit %.0f ms)%n", worstMs, LIMIT_MS);
         System.out.println(failed ? "RESULT: FAIL" : "RESULT: PASS");
@@ -160,6 +176,25 @@ public class PerfCheck {
     }
 
     // ------------------------------------------------------------ helpers
+
+    @FunctionalInterface
+    private interface WriteOp {
+        void run(int i) throws Exception;
+    }
+
+    private static void timeWrite(String name, int times, WriteOp op) throws Exception {
+        double total = 0, worst = 0;
+        for (int i = 0; i < times; i++) {
+            long s = System.nanoTime();
+            op.run(i);
+            double d = ms(s);
+            total += d;
+            worst = Math.max(worst, d);
+        }
+        System.out.printf("%-18s %9s %9.2f %9.2f%n", name, "x" + times, total / times, worst);
+        track(worst, name);
+    }
+
 
     private static double ms(long startNanos) {
         return (System.nanoTime() - startNanos) / 1_000_000.0;

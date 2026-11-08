@@ -7,7 +7,7 @@ import com.slangdict.util.AppPaths;
 /**
  * Điểm vào của ứng dụng.
  *
- * <p>TẠM THỜI: mở dữ liệu, in thống kê và chạy menu console để thử F1/F2/F3.
+ * <p>TẠM THỜI: mở dữ liệu, in thống kê và chạy menu console để thử F1–F7.
  * Sẽ được thay bằng việc mở MainFrame ở Phase 5.
  */
 public final class Main {
@@ -17,6 +17,8 @@ public final class Main {
 
     public static void main(String[] args) throws Exception {
         DictionaryService service = DictionaryService.open();
+        // Ghi index khi thoát, kể cả khi bị Ctrl+C (close() an toàn khi gọi nhiều lần)
+        Runtime.getRuntime().addShutdownHook(new Thread(service::close));
 
         System.out.println("Data dir : " + AppPaths.dataDir());
         System.out.println("Entries  : " + service.size());

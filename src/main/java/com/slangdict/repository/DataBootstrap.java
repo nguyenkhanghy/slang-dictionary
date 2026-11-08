@@ -29,4 +29,9 @@ public final class DataBootstrap {
         }
         Files.copy(original, current);
     }
+
+    /** Sao chép {@code source} đè lên {@code target} một cách an toàn (file tạm + move). */
+    public static void replaceWithCopy(Path source, Path target) throws IOException {
+        AtomicFiles.write(target, out -> Files.copy(source, out));
+    }
 }
