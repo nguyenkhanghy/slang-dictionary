@@ -13,7 +13,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
@@ -25,7 +24,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 /**
  * Màn F3: các lần tìm gần đây (mới nhất ở trên) dạng bảng "Thời gian | Loại | Từ khóa", và nút xóa lịch sử (có xác nhận).
@@ -53,16 +51,12 @@ final class HistoryPage extends JPanel {
     private final ActionButton clearButton = new ActionButton(Messages.HISTORY_CLEAR_BUTTON);
     private final LatestTask<List<String[]>> loadTask;
     private final LatestTask<List<String[]>> clearTask;
-    private final BooleanSupplier confirmClear;
+    private final Dialogs dialogs;
 
-    HistoryPage(DictionaryService service) {
-        this(service, HistoryPage::askConfirmation);
-    }
-
-    /** {@code confirmClear} trả true nếu người dùng đồng ý xóa (tách riêng để kiểm thử không cần hộp thoại). */
-    HistoryPage(DictionaryService service, BooleanSupplier confirmClear) {
+    /** {@code dialogs} dùng để hỏi xác nhận xóa (tách riêng để kiểm thử không cần hộp thoại thật). */
+    HistoryPage(DictionaryService service, Dialogs dialogs) {
         super(new BorderLayout());
-        this.confirmClear = confirmClear;
+        this.dialogs = dialogs;
         setBackground(Theme.BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL));
 
@@ -73,7 +67,8 @@ final class HistoryPage extends JPanel {
         }, this::showRows, this::showError);
         clearButton.setEnabled(false);
         clearButton.addActionListener(e -> {
-            if (this.confirmClear.getAsBoolean()) {
+            if (this.dialogs.confirm(this, Messages.HISTORY_CONFIRM_TITLE, Messages.HISTORY_CONFIRM_MESSAGE,
+                    Messages.HISTORY_CONFIRM_YES, Messages.HISTORY_CONFIRM_NO)) {
                 clearTask.request();
             }
         });
@@ -98,13 +93,6 @@ final class HistoryPage extends JPanel {
             rows.add(new String[]{TIME_FORMAT.format(entry.time()), Messages.historyType(entry.type()), entry.query()});
         }
         return rows;
-    }
-
-    private static boolean askConfirmation() {
-        Object[] options = {Messages.HISTORY_CONFIRM_YES, Messages.HISTORY_CONFIRM_NO};
-        int choice = JOptionPane.showOptionDialog(null, Messages.HISTORY_CONFIRM_MESSAGE, Messages.HISTORY_CONFIRM_TITLE,
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-        return choice == 0;
     }
 
     // ------------------------------------------------------------------ dựng giao diện

@@ -1,5 +1,11 @@
 package com.slangdict.ui.components;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -13,13 +19,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 /**
  * Ô nhập một dòng tự vẽ theo {@link Theme}: nền trắng bo góc, viền đổi màu khi có focus, chữ gợi ý khi rỗng,
@@ -89,8 +88,17 @@ public final class SearchField extends JPanel {
         input.addActionListener(listener);
     }
 
+    /** Khóa/mở ô nhập (ô bị khóa nhạt màu, không nhận chữ, không hiện nút ×). */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        input.setEnabled(enabled);
+        refreshClearButton();
+        repaint();
+    }
+
     private void refreshClearButton() {
-        boolean show = !input.getText().isEmpty();
+        boolean show = input.isEnabled() && !input.getText().isEmpty();
         if (clearButton.isVisible() != show) {
             clearButton.setVisible(show);
             revalidate();
@@ -110,7 +118,7 @@ public final class SearchField extends JPanel {
         try {
             int arc = Theme.RADIUS * 2;
             boolean focused = input.hasFocus();
-            g2.setColor(Theme.SURFACE);
+            g2.setColor(isEnabled() ? Theme.SURFACE : Theme.BACKGROUND);
             g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, arc, arc);
             g2.setColor(focused ? Theme.INPUT_BORDER_FOCUS : Theme.INPUT_BORDER);
             g2.setStroke(new BasicStroke(focused ? 2f : 1f));
@@ -136,6 +144,7 @@ public final class SearchField extends JPanel {
             setCaretColor(Theme.TEXT);
             setSelectionColor(Theme.ACCENT);
             setSelectedTextColor(Theme.ON_ACCENT);
+            setDisabledTextColor(Theme.TEXT_MUTED);
             getAccessibleContext().setAccessibleName(hint);
         }
 

@@ -96,6 +96,12 @@ public final class Theme {
     public static final int QUIZ_OPTION_PAD_X = 16;
     public static final int QUIZ_OPTION_PAD_Y = 12;
     public static final int QUIZ_BADGE_SIZE = 26;
+    /** Bề rộng ô "Từ lóng" trong biểu mẫu thêm/sửa (ô "Nghĩa" lấy phần còn lại). */
+    public static final int FORM_SLANG_FIELD_WIDTH = 200;
+    /** Chiều cao tối thiểu dành cho dòng thông báo kết quả (tránh bố cục nhảy khi thông báo hiện/ẩn). */
+    public static final int STATUS_LINE_MIN_HEIGHT = 40;
+    /** Bề rộng chữ trong hộp thoại xác nhận/thông báo. */
+    public static final int DIALOG_TEXT_WIDTH = 360;
 
     /** Kích thước mặc định của cửa sổ chính (quyết định Q5): 1000x680. */
     public static Dimension windowDefaultSize() {

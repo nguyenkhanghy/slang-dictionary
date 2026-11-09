@@ -1,10 +1,9 @@
 package com.slangdict.ui;
 
-import java.util.List;
+import com.slangdict.model.SlangWord;
 
 import javax.swing.table.AbstractTableModel;
-
-import com.slangdict.model.SlangWord;
+import java.util.List;
 
 /**
  * Model ảo của bảng kết quả: không tạo component cho từng dòng, chỉ giữ danh sách và chuỗi nghĩa đã dựng sẵn.
@@ -23,6 +22,10 @@ final class ResultTableModel extends AbstractTableModel {
         this.words = words;
         this.meanings = meanings;
         fireTableDataChanged();
+    }
+
+    SlangWord wordAt(int row) {
+        return words.get(row);
     }
 
     String slangAt(int row) {

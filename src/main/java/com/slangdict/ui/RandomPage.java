@@ -28,7 +28,7 @@ import java.util.Optional;
  * {@link QuizService#randomSlang()} trên luồng nền chung ({@link ServiceExecutor}); bấm liên tiếp nhanh thì luôn hiện kết quả
  * của lần bấm cuối ({@link LatestTask}). Không ghi history.
  */
-final class RandomPage extends JPanel {
+final class RandomPage extends JPanel implements DataAware {
 
     private static final String CARD_BLANK = "blank";
     private static final String CARD_STATE = "state";
@@ -65,6 +65,13 @@ final class RandomPage extends JPanel {
                 }
             }
         });
+    }
+
+    /** Dữ liệu vừa đổi: từ đang hiện có thể đã bị sửa/xóa, nên bỏ đi và bốc lại ở lần hiện trang kế tiếp. */
+    @Override
+    public void dataChanged() {
+        loadedOnce = false;
+        cards.show(body, CARD_BLANK);
     }
 
     /** Chạy trên luồng nền. */

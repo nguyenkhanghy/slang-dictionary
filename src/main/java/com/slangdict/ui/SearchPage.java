@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * kết quả) được giữ nguyên khi chuyển sang trang khác rồi quay lại, vì {@code CardLayout} giữ nguyên component.
  * Trang này không tự lọc/so khớp chữ: luôn nhờ service.
  */
-final class SearchPage extends JPanel {
+final class SearchPage extends JPanel implements DataAware {
 
     private static final Logger LOG = Logger.getLogger(SearchPage.class.getName());
 
@@ -169,6 +169,19 @@ final class SearchPage extends JPanel {
 
     /** Nút ×: về trạng thái "chưa tìm" (không ghi history); kết quả của lượt đang chạy (nếu có) sẽ bị bỏ. */
     private void clear() {
+        generation++;
+        queued = null;
+        busyTimer.stop();
+        searchButton.setEnabled(true);
+        showIdle();
+    }
+
+    /**
+     * Dữ liệu từ điển vừa đổi (thêm/sửa/xóa/reset ở trang khác): kết quả đang hiện có thể đã cũ nên bỏ đi và về trạng
+     * thái "chưa tìm" (giữ nguyên chữ trong ô). Không tìm lại tự động vì mỗi lần tìm sẽ ghi thêm vào lịch sử.
+     */
+    @Override
+    public void dataChanged() {
         generation++;
         queued = null;
         busyTimer.stop();

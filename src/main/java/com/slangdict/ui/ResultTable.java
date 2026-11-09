@@ -1,18 +1,11 @@
 package com.slangdict.ui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
+import com.slangdict.model.SlangWord;
+import com.slangdict.ui.components.Theme;
 
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
@@ -20,9 +13,15 @@ import javax.swing.border.Border;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-
-import com.slangdict.model.SlangWord;
-import com.slangdict.ui.components.Theme;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Component;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Bảng kết quả tìm kiếm hai cột "Từ lóng | Nghĩa". Chữ dài tự xuống dòng và chiều cao mỗi hàng co theo nội dung.
@@ -60,6 +59,11 @@ final class ResultTable extends JTable {
         if (getParent() instanceof JViewport viewport) {
             viewport.setViewPosition(new Point(0, 0));
         }
+    }
+
+    /** Entry ở hàng {@code row} (chỉ số theo model; bảng không sắp xếp lại nên trùng chỉ số hiển thị). */
+    SlangWord wordAt(int row) {
+        return data.wordAt(row);
     }
 
     private void configure() {

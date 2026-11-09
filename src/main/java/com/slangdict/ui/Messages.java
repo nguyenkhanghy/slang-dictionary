@@ -1,6 +1,7 @@
 package com.slangdict.ui;
 
 import com.slangdict.model.SearchType;
+import com.slangdict.service.ValidationException;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -222,6 +223,94 @@ public final class Messages {
     public static String quizEmptyDetail() {
         return "Cần ít nhất bốn từ lóng có nghĩa khác nhau. Hãy thêm từ lóng ở mục “" + navLabel(Page.ADD)
                 + "” hoặc khôi phục dữ liệu gốc.";
+    }
+
+    // ------------------------------------------------------------------ quản lý từ điển (F4–F7) và hộp thoại (U5)
+
+    public static final String FORM_SLANG_HINT = "Từ lóng";
+    public static final String FORM_MEANINGS_HINT = "Nghĩa 1 | Nghĩa 2";
+    public static final String PICKER_IDLE_TITLE = "Chưa chọn từ lóng nào";
+    public static final String SAVE_ERROR_TITLE = "Không thể lưu dữ liệu";
+    public static final String SAVE_ERROR_DETAIL =
+            "Không ghi được file dữ liệu. Hãy kiểm tra quyền ghi trong thư mục dữ liệu rồi thử lại. "
+                    + "Từ điển chưa bị thay đổi.";
+
+    public static final String ADD_BUTTON = "Thêm";
+    public static final String EDIT_SAVE_BUTTON = "Lưu";
+    public static final String DELETE_BUTTON = "Xóa mục đã chọn";
+    public static final String RESET_BUTTON = "Khôi phục dữ liệu gốc";
+
+    public static final String EDIT_IDLE_DETAIL =
+            "Nhập một từ lóng và nhấn Tìm, chọn một dòng trong kết quả rồi sửa nội dung ở phía dưới.";
+    public static final String DELETE_IDLE_DETAIL =
+            "Nhập một từ lóng và nhấn Tìm, chọn một dòng trong kết quả rồi bấm “" + DELETE_BUTTON + "”.";
+
+    public static String addedMessage(String slang) {
+        return "Đã thêm “" + preview(slang) + "” vào từ điển.";
+    }
+
+    public static String overwrittenMessage(String slang) {
+        return "Đã ghi đè “" + preview(slang) + "” bằng nội dung mới.";
+    }
+
+    public static String editedMessage(String slang) {
+        return "Đã lưu thay đổi cho “" + preview(slang) + "”.";
+    }
+
+    public static final String EDIT_UNCHANGED = "Chưa có thay đổi nào để lưu.";
+    public static final String EDIT_NOT_FOUND = "Mục này không còn trong từ điển (có thể đã bị xóa hoặc đổi). Hãy tìm lại.";
+
+    public static String editConflictMessage(String slang) {
+        return "Từ lóng “" + preview(slang) + "” đã có trong từ điển. Hãy chọn một tên khác.";
+    }
+
+    public static String deletedMessage(String slang) {
+        return "Đã xóa “" + preview(slang) + "” khỏi từ điển.";
+    }
+
+    public static final String DELETE_NOT_FOUND = "Mục này đã không còn trong từ điển.";
+    public static final String DELETE_CONFIRM_TITLE = "Xóa từ lóng";
+    public static final String DELETE_CONFIRM_YES = "Xóa";
+    public static final String DELETE_CONFIRM_NO = "Hủy";
+
+    public static String deleteConfirmMessage(String slang) {
+        return "Bạn có chắc muốn xóa “" + preview(slang) + "” khỏi từ điển? Thao tác này không thể hoàn tác.";
+    }
+
+    public static final String RESET_CONFIRM_TITLE = "Khôi phục dữ liệu gốc";
+    public static final String RESET_CONFIRM_MESSAGE =
+            "Mọi thay đổi của bạn trong từ điển sẽ mất; lịch sử tìm kiếm vẫn được giữ. Bạn có chắc muốn khôi phục?";
+    public static final String RESET_CONFIRM_YES = "Khôi phục";
+    public static final String RESET_CONFIRM_NO = "Hủy";
+    public static final String RESET_MISSING_ORIGINAL =
+            "Không tìm thấy file dữ liệu gốc (slang.original.txt) trong thư mục dữ liệu nên chưa khôi phục được.";
+    public static final String RESET_ERROR =
+            "Không khôi phục được dữ liệu. Từ điển chưa bị thay đổi; hãy kiểm tra quyền đọc, ghi trong thư mục dữ liệu.";
+
+    public static String resetDoneMessage(int count) {
+        return "Đã khôi phục dữ liệu gốc: " + NumberFormat.getIntegerInstance(VIETNAMESE).format(count)
+                + " từ lóng.";
+    }
+
+    public static final String DUPLICATE_TITLE = "Từ lóng đã tồn tại";
+    public static final String DUPLICATE_OVERWRITE = "Ghi đè";
+    public static final String DUPLICATE_ADD = "Thêm bản trùng";
+    public static final String DUPLICATE_CANCEL = "Hủy";
+
+    public static String duplicateMessage(String slang) {
+        return "“" + preview(slang) + "” đã có trong từ điển. Ghi đè sẽ thay mọi bản cũ bằng nội dung mới; "
+                + "thêm bản trùng sẽ giữ bản cũ và thêm một mục nữa. Bạn muốn làm gì?";
+    }
+
+    /** Thông báo thân thiện cho từng lý do dữ liệu nhập không hợp lệ ({@code InputValidator}). */
+    public static String validationMessage(ValidationException.Reason reason) {
+        return switch (reason) {
+            case SLANG_EMPTY -> "Hãy nhập từ lóng.";
+            case SLANG_INVALID_CHAR -> "Từ lóng không được chứa dấu ` hoặc xuống dòng.";
+            case NO_MEANING -> "Hãy nhập ít nhất một nghĩa.";
+            case MEANING_EMPTY -> "Có một nghĩa đang để trống.";
+            case MEANING_INVALID_CHAR -> "Nghĩa không được chứa dấu ` hoặc xuống dòng; nhiều nghĩa hãy ngăn bằng dấu |.";
+        };
     }
 
     /** Rút gọn từ khóa người dùng nhập để thông báo không bị dài quá khổ. */

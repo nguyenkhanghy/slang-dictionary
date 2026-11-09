@@ -31,6 +31,7 @@ final class NavSidebar extends JPanel {
 
     private final Map<Page, NavButton> buttons = new EnumMap<>(Page.class);
     private final ButtonGroup group = new ButtonGroup();
+    private JLabel footerLabel;
     private Consumer<Page> onSelect = page -> { };
 
     NavSidebar(String footerText, String footerTooltip) {
@@ -49,6 +50,12 @@ final class NavSidebar extends JPanel {
     /** Đăng ký hàm được gọi mỗi khi một mục được chọn (bằng chuột, bàn phím hoặc {@link #select}). */
     void setOnSelect(Consumer<Page> onSelect) {
         this.onSelect = onSelect;
+    }
+
+    /** Đổi dòng thông tin dữ liệu ở chân sidebar (ví dụ số từ lóng sau khi thêm/xóa). Gọi trên EDT. */
+    void setFooter(String text, String tooltip) {
+        footerLabel.setText(text);
+        footerLabel.setToolTipText(tooltip);
     }
 
     void select(Page page) {
@@ -123,6 +130,7 @@ final class NavSidebar extends JPanel {
         label.setFont(Theme.FONT_SMALL);
         label.setForeground(Theme.TEXT_MUTED);
         label.setToolTipText(tooltip);
+        footerLabel = label;
         label.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.BORDER),
                 BorderFactory.createEmptyBorder(Theme.SPACE_S, Theme.SPACE_M, 0, 0)));

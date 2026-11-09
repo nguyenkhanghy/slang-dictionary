@@ -33,7 +33,7 @@ import java.util.Optional;
  * đã chọn tô đỏ) và không đổi được nữa; nút "Câu tiếp theo" luôn hiện (bỏ qua câu cũng được, và dùng để thử lại khi lỗi).
  * Chưa tính điểm. Tạo câu hỏi chạy trên luồng nền chung ({@link ServiceExecutor}) qua {@link LatestTask}.
  */
-final class QuizPage extends JPanel {
+final class QuizPage extends JPanel implements DataAware {
 
     /** F9 hoặc F10. */
     enum Kind {
@@ -89,6 +89,14 @@ final class QuizPage extends JPanel {
                 }
             }
         });
+    }
+
+    /** Dữ liệu vừa đổi: câu hỏi đang hiện dựa trên dữ liệu cũ, nên bỏ đi và tạo câu mới ở lần hiện trang kế tiếp. */
+    @Override
+    public void dataChanged() {
+        loadedOnce = false;
+        question = null;
+        cards.show(body, CARD_BLANK);
     }
 
     /** Chạy trên luồng nền. */
