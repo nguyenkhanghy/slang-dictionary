@@ -40,7 +40,7 @@
 | ID | Chức năng |
 |----|-----------|
 | F1 | Tìm theo slang word. |
-| F2 | Tìm theo definition: hiện tất cả slang có nghĩa chứa keyword. Mỗi dòng kết quả chỉ hiển thị nghĩa khớp với keyword tìm kiếm. |
+| F2 | Tìm theo definition: hiện **tất cả** slang có definition chứa keyword. |
 | F3 | Hiển thị History các slang đã tìm. |
 | F4 | Add slang mới; nếu trùng → báo + hỏi **Overwrite** hay **Duplicate**. |
 | F5 | Edit 1 slang. |
@@ -125,10 +125,6 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 - **Persist index (R4):** ghi `SlangIndex` (cả entries + 2 map) ra `data/slang.index.bin` bằng **định dạng nhị phân tự định nghĩa** (`DataOutputStream`; không dùng Java Serialization vì chậm với 100k object). Header: `MAGIC, VERSION, size, CRC32` của `slang.current.txt`; footer `END_MAGIC`. Khởi động: nếu khớp → nạp index trực tiếp (không đọc/parse txt); nếu lệch/thiếu/hỏng → rebuild từ txt rồi ghi lại index. Dùng CRC32 thay vì ngày sửa file vì ngày sửa bị đổi khi giải nén zip.
 - **Tìm theo definition (F2):** khớp **chuỗi con** không phân biệt hoa/thường. Quét từ vựng tìm token chứa keyword → hợp posting list → (keyword nhiều từ/có ký tự đặc biệt) kiểm tra lại bằng `contains`.
 - Add/Edit/Delete: cập nhật RAM + ghi `slang.current.txt` + cập nhật `slang.index.bin` (có thể gom ghi khi thoát app và khi đóng cửa sổ, nhưng file txt phải ghi ngay).
-- Một SlangWord có thể chứa nhiều meanings và khi hiển thị kết quả tìm kiếm, mỗi meaning được biểu diễn thành một dòng riêng.
-- Các dòng có cùng slang vẫn được xem là những nghĩa thuộc cùng một slang.
-- F2 chỉ hiển thị những meaning thực sự khớp keyword.
-- Việc tách dòng là quy tắc hiển thị, không đồng nghĩa với việc thay đổi định dạng lưu trữ trong file.
 
 ### 3.5 Xử lý dữ liệu lỗi (yêu cầu của GV)
 Đã khảo sát `slang.txt` (7.662 dòng):
@@ -236,19 +232,14 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | U1 | Quyết định look&feel (Nimbus / FlatLaf) | M | `[x]` | |
 | U2 | `MainFrame` + sidebar/tab điều hướng 10 chức năng | M | `[x]` | |
 | U3 | Màn Search (slang + definition, kết quả dạng bảng/card) | M | `[x]` | |
-| U4a | Màn History (F3) + Random (F8) | M | `[x]` | |
-| U4b | Màn Quiz (F9 + F10) | M | `[x]` | |
+| U4a | Màn History (F3) + Random (F8) | M | `[ ]` | |
+| U4b | Màn Quiz (F9 + F10) | M | `[ ]` | |
 | U4c | Màn Quản lý: Add/Edit/Delete/Reset | M | `[ ]` | |
 | U5 | Dialog confirm/thông báo thống nhất | M | `[ ]` | |
 | U6 | Theme (màu, font, icon), spacing nhất quán | M | `[ ]` | |
 | U7 | Dark mode / đổi theme | O | `[ ]` | |
 | U8 | Phím tắt, Enter để tìm, focus hợp lý | O | `[ ]` | |
 | U9 | Animation nhẹ, highlight keyword trong kết quả | O | `[ ]` | |
-> Ghi chú: Sau khi hoàn thành U4c + U5, thực hiện đợt cải tiến UX và CRUD:
-> - Tách mỗi nghĩa thành một dòng trên giao diện.
-> - Xử lý nghĩa trùng hoàn toàn.
-> - Cho phép thêm nghĩa mới vào slang đã tồn tại.
-> - Thống nhất dấu phân cách nghĩa bằng `|`.
 
 ### Phase 6–7 — Hardening & Delivery
 | ID | Task | Ưu tiên | Trạng thái | Notes |
@@ -352,10 +343,4 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-08 | Kích hoạt tìm: Enter hoặc nút "Tìm" (không tìm-khi-gõ). | Không làm rác file history |
 | 2026-11-08 | Nút × xóa nhanh đưa về trạng thái "chưa tìm". | Thân thiện với người dùng, không ghi history |
 | 2026-11-08 | Không chuyển thẳng từ Search sang Add/Edit/Delete ở U3. | Giao diện quản lý sẽ được tách làm riêng ở U4c |
-| 2026-11-09 | Hoàn thành và xác nhận U4c + U5 trước khi xử lý các Issue mới | Giữ một mốc Git ổn định |
-| 2026-11-09 | Chỉ sử dụng `|` để phân tách các nghĩa; `/`, `-` là ký tự bình thường | Tránh phân tách sai nghĩa |
-| 2026-11-09 | Nghĩa trùng hoàn toàn khi Add sẽ bị bỏ qua, không ghi đè | Tránh dữ liệu trùng |
-| 2026-11-09 | Add nghĩa khác cho slang đã tồn tại sẽ tạo thêm nghĩa mới | Không ghi đè dữ liệu cũ |
-| 2026-11-09 | Mỗi nghĩa hiển thị thành một dòng riêng trên GUI | Dễ tìm kiếm, sửa và xóa |
-| 2026-11-09 | F2 chỉ hiển thị các nghĩa khớp keyword | Tránh kết quả dư thừa |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
