@@ -1,14 +1,14 @@
 package com.slangdict.ui;
 
+import javax.swing.JComponent;
+
 import com.slangdict.model.SearchType;
 import com.slangdict.service.DictionaryService;
 import com.slangdict.service.QuizService;
 
-import javax.swing.JComponent;
-
 /**
- * Tạo màn hình cho từng {@link Page}. Mọi mục đã là màn thật (U3: F1/F2; U4a: F3, F8; U4b: F9, F10; U4c: F4–F7);
- * {@link PlaceholderPage} chỉ còn là phương án dự phòng cho {@link Page} mới thêm sau này.
+ * Tạo màn hình cho từng {@link Page} (F1–F10). Câu lệnh {@code switch} cố ý KHÔNG có nhánh mặc định: thêm một giá trị
+ * vào {@link Page} mà quên tạo màn ở đây sẽ báo lỗi biên dịch thay vì hiện một trang trống lúc chạy.
  */
 final class PageFactory {
 
@@ -31,7 +31,6 @@ final class PageFactory {
             case RANDOM -> new RandomPage(new QuizService(service));
             case QUIZ_SLANG_TO_MEANING -> new QuizPage(QuizPage.Kind.SLANG_TO_MEANING, new QuizService(service));
             case QUIZ_MEANING_TO_SLANG -> new QuizPage(QuizPage.Kind.MEANING_TO_SLANG, new QuizService(service));
-            default -> new PlaceholderPage(page);
         };
     }
 }

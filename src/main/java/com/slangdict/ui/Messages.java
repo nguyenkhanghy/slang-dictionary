@@ -64,7 +64,7 @@ public final class Messages {
             case EDIT -> "Sửa từ lóng";
             case DELETE -> "Xóa từ lóng";
             case RESET -> "Khôi phục dữ liệu gốc";
-            case RANDOM -> "Từ lóng ngẫu nhiên";
+            case RANDOM -> "Từ lóng của ngày";
             case QUIZ_SLANG_TO_MEANING -> "Đố nghĩa của từ lóng";
             case QUIZ_MEANING_TO_SLANG -> "Đố tìm từ lóng";
         };
@@ -96,7 +96,7 @@ public final class Messages {
             case DELETE -> "Chọn một từ lóng để xóa khỏi từ điển. Bạn sẽ được hỏi xác nhận trước khi xóa.";
             case RESET -> "Đưa từ điển về danh sách ban đầu. Mọi thay đổi của bạn sẽ mất, "
                     + "lịch sử tìm kiếm vẫn được giữ.";
-            case RANDOM -> "Xem một từ lóng bất kỳ để khám phá thêm.";
+            case RANDOM -> "Xem từ lóng của hôm nay, hoặc bấm Từ khác để bốc một từ ngẫu nhiên.";
             case QUIZ_SLANG_TO_MEANING -> "Cho một từ lóng, chọn nghĩa đúng trong bốn đáp án.";
             case QUIZ_MEANING_TO_SLANG -> "Cho một nghĩa, chọn từ lóng đúng trong bốn đáp án.";
         };
@@ -165,7 +165,7 @@ public final class Messages {
         return NumberFormat.getIntegerInstance(VIETNAMESE).format(count) + " kết quả";
     }
 
-    // ------------------------------------------------------------------ chung cho các màn U4
+    // ------------------------------------------------------------------ chung cho các màn chức năng
 
     public static final String UNEXPECTED_ERROR_DETAIL =
             "Đã xảy ra lỗi bất ngờ. Bạn hãy thử lại; nếu lỗi vẫn còn, hãy đóng và mở lại ứng dụng.";
@@ -230,7 +230,7 @@ public final class Messages {
                 + "” hoặc khôi phục dữ liệu gốc.";
     }
 
-    // ------------------------------------------------------------------ quản lý từ điển (F4–F7) và hộp thoại (U5)
+    // ------------------------------------------------------------------ quản lý từ điển (F4–F7) và hộp thoại
 
     public static final String FORM_SLANG_HINT = "Từ lóng";
     public static final String FORM_MEANINGS_HINT = "Nghĩa 1 | Nghĩa 2";
