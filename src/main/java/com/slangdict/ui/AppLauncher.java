@@ -1,14 +1,14 @@
 package com.slangdict.ui;
 
-import com.slangdict.service.DictionaryService;
-import com.slangdict.ui.components.Theme;
-import com.slangdict.util.AppPaths;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingWorker;
+
+import com.slangdict.service.DictionaryService;
+import com.slangdict.ui.components.Theme;
+import com.slangdict.util.AppPaths;
 
 /**
  * Khởi động giao diện: hiện cửa sổ tải ngay, mở {@link DictionaryService} ở luồng nền (không chặn EDT),
@@ -19,6 +19,7 @@ public final class AppLauncher {
     private static final Logger LOG = Logger.getLogger(AppLauncher.class.getName());
 
     private final LoadingWindow loading;
+    private final Dialogs dialogs = new SwingDialogs();
     private boolean closeRequested; // chỉ đọc/ghi trên EDT
 
     private AppLauncher() {
@@ -53,8 +54,7 @@ public final class AppLauncher {
             System.exit(0);
         }
         String reason = cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName();
-        JOptionPane.showMessageDialog(null, Messages.errorOpenMessage(dataDirText(), reason),
-                Messages.ERROR_OPEN_TITLE, JOptionPane.ERROR_MESSAGE);
+        dialogs.error(null, Messages.ERROR_OPEN_TITLE, Messages.errorOpenMessage(dataDirText(), reason));
         System.exit(1);
     }
 

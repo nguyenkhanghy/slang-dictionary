@@ -1,16 +1,17 @@
 package com.slangdict.ui;
 
+import java.awt.BorderLayout;
+import java.util.Optional;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+
 import com.slangdict.model.SlangWord;
 import com.slangdict.service.DictionaryService;
 import com.slangdict.ui.components.ActionButton;
 import com.slangdict.ui.components.Theme;
-
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.util.Optional;
 
 /**
  * Màn F6: tìm một từ lóng, chọn một dòng trong kết quả rồi xóa dòng đó. Luôn hỏi xác nhận trước khi xóa (nút mặc định là
@@ -25,7 +26,7 @@ final class DeletePage extends JPanel implements DataAware {
     private final DataEvents events;
     private final Dialogs dialogs;
     private final EntryPicker picker;
-    private final ActionButton deleteButton = new ActionButton(Messages.DELETE_BUTTON);
+    private final ActionButton deleteButton = ActionButton.danger(Messages.DELETE_BUTTON);
     private final StatusLine status = new StatusLine();
     private boolean busy;
 

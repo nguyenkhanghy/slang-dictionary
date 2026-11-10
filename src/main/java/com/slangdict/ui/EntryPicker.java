@@ -1,5 +1,21 @@
 package com.slangdict.ui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import com.slangdict.model.SearchType;
 import com.slangdict.model.SlangWord;
 import com.slangdict.service.DictionaryService;
@@ -9,21 +25,6 @@ import com.slangdict.ui.components.RoundedPanel;
 import com.slangdict.ui.components.SearchField;
 import com.slangdict.ui.components.SlimScrollBarUI;
 import com.slangdict.ui.components.Theme;
-
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Bộ chọn entry cho màn Sửa/Xóa: ô tìm theo từ lóng (khớp chính xác, KHÔNG ghi history), bảng kết quả và việc chọn một dòng.
@@ -128,7 +129,7 @@ final class EntryPicker extends JPanel {
         row.setAlignmentX(LEFT_ALIGNMENT);
         countLabel.setAlignmentX(LEFT_ALIGNMENT);
         top.add(row);
-        top.add(Box.createVerticalStrut(Theme.SPACE_S));
+        top.add(Box.createVerticalStrut(Theme.SPACE_M)); // như SearchPage: ô tìm → dòng đếm cách SPACE_M
         top.add(countLabel);
         top.add(Box.createVerticalStrut(Theme.SPACE_S));
         return top;

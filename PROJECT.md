@@ -232,11 +232,11 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | U1 | Quyết định look&feel (Nimbus / FlatLaf) | M | `[x]` | |
 | U2 | `MainFrame` + sidebar/tab điều hướng 10 chức năng | M | `[x]` | |
 | U3 | Màn Search (slang + definition, kết quả dạng bảng/card) | M | `[x]` | |
-| U4a | Màn History (F3) + Random (F8) | M | `[ ]` | |
-| U4b | Màn Quiz (F9 + F10) | M | `[ ]` | |
-| U4c | Màn Quản lý: Add/Edit/Delete/Reset | M | `[ ]` | |
-| U5 | Dialog confirm/thông báo thống nhất | M | `[ ]` | |
-| U6 | Theme (màu, font, icon), spacing nhất quán | M | `[ ]` | |
+| U4a | Màn History (F3) + Random (F8) | M | `[x]` | |
+| U4b | Màn Quiz (F9 + F10) | M | `[x]` | |
+| U4c | Màn Quản lý: Add/Edit/Delete/Reset | M | `[x]` | |
+| U5 | Dialog confirm/thông báo thống nhất | M | `[x]` | |
+| U6 | Theme (màu, font, icon), spacing nhất quán | M | `[x]` | không làm icon (quyết định); đã rà spacing |
 | U7 | Dark mode / đổi theme | O | `[ ]` | |
 | U8 | Phím tắt, Enter để tìm, focus hợp lý | O | `[ ]` | |
 | U9 | Animation nhẹ, highlight keyword trong kết quả | O | `[ ]` | |
@@ -343,4 +343,11 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-08 | Kích hoạt tìm: Enter hoặc nút "Tìm" (không tìm-khi-gõ). | Không làm rác file history |
 | 2026-11-08 | Nút × xóa nhanh đưa về trạng thái "chưa tìm". | Thân thiện với người dùng, không ghi history |
 | 2026-11-08 | Không chuyển thẳng từ Search sang Add/Edit/Delete ở U3. | Giao diện quản lý sẽ được tách làm riêng ở U4c |
+| 2026-11-10 | Xóa chế độ `--console` và `dev/DevConsole`; `Main` bỏ qua tham số. | Chuyển sang ứng dụng GUI thuần túy, loại bỏ các thành phần rác của phase trước. |
+| 2026-11-10 | Nút phá hủy dùng `ActionButton.danger` (nền `Theme.DANGER`, hover `Theme.DANGER_DARK`, chữ trắng). | Giúp phân biệt rõ ràng các hành động nguy hiểm (xóa/khôi phục), tránh thao tác nhầm. |
+| 2026-11-10 | `ResultTable` trở thành lớp con của `WrapTable`; `ResultTableModel` bị xóa. | Giảm nợ kỹ thuật, hợp nhất logic hiển thị bảng để dễ bảo trì. |
+| 2026-11-10 | Hộp thoại lỗi mở dữ liệu của `AppLauncher` đi qua `Dialogs.error`; giữ `JOptionPane` làm cài đặt mặc định. | Đồng bộ hóa hệ thống thông báo toàn dự án mà không tốn công vẽ lại UI phức tạp. |
+| 2026-11-10 | Không làm icon sidebar. | Giữ giao diện thống nhất, tối giản theo quyết định từ ban đầu. |
+| 2026-11-10 | `WrappedText` được sửa để hiểu ngắt đoạn `\n` và bẻ cứng từ dài. | Khắc phục lỗi dính chữ và tràn hộp thoại đối với các đường dẫn hệ thống dài. |
 | _TBD_ | Có commit `slang.index.bin` hay không? | Cần chốt (khuyến nghị: **không commit**, app tự sinh; nhưng **nộp kèm** trong zip) |
+

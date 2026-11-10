@@ -1,20 +1,5 @@
 package com.slangdict.ui;
 
-import com.slangdict.model.HistoryEntry;
-import com.slangdict.service.DictionaryService;
-import com.slangdict.ui.components.ActionButton;
-import com.slangdict.ui.components.RoundedPanel;
-import com.slangdict.ui.components.SlimScrollBarUI;
-import com.slangdict.ui.components.Theme;
-import com.slangdict.ui.components.WrappedText;
-
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -24,6 +9,22 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import com.slangdict.model.HistoryEntry;
+import com.slangdict.service.DictionaryService;
+import com.slangdict.ui.components.ActionButton;
+import com.slangdict.ui.components.RoundedPanel;
+import com.slangdict.ui.components.SlimScrollBarUI;
+import com.slangdict.ui.components.Theme;
+import com.slangdict.ui.components.WrappedText;
 
 /**
  * Màn F3: các lần tìm gần đây (mới nhất ở trên) dạng bảng "Thời gian | Loại | Từ khóa", và nút xóa lịch sử (có xác nhận).
@@ -48,7 +49,7 @@ final class HistoryPage extends JPanel {
             new WrapTable.Column(Messages.COLUMN_TYPE, Theme.FONT_BODY, Theme.TEXT_MUTED, Theme.HISTORY_TYPE_COLUMN_WIDTH),
             new WrapTable.Column(Messages.COLUMN_QUERY, Theme.FONT_BODY_BOLD, Theme.TEXT, 0)));
     private final JLabel countLabel = new JLabel(" ");
-    private final ActionButton clearButton = new ActionButton(Messages.HISTORY_CLEAR_BUTTON);
+    private final ActionButton clearButton = ActionButton.danger(Messages.HISTORY_CLEAR_BUTTON);
     private final LatestTask<List<String[]>> loadTask;
     private final LatestTask<List<String[]>> clearTask;
     private final Dialogs dialogs;

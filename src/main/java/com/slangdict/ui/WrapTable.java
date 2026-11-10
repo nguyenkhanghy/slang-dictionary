@@ -1,6 +1,15 @@
 package com.slangdict.ui;
 
-import com.slangdict.ui.components.Theme;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -13,24 +22,16 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.slangdict.ui.components.Theme;
 
 /**
- * Bảng chỉ đọc nhiều cột toàn chữ, mỗi ô tự xuống dòng và chiều cao hàng co theo ô cao nhất (dùng cho lịch sử tìm kiếm).
- * Các cột đầu có bề rộng cố định, cột cuối lấy phần còn lại. Cùng cách làm với {@link ResultTable} (đo và vẽ bằng
- * {@link TextWrapper} nên không cắt chữ; border của JScrollPane không bị JTable ghi đè; góc trên-phải liền màu tiêu đề);
- * khác ở chỗ số cột, font và màu tùy chọn, dữ liệu là {@code List<String[]>}. Chạy trên EDT.
+ * Bảng chỉ đọc nhiều cột toàn chữ, mỗi ô tự xuống dòng và chiều cao hàng co theo ô cao nhất. Các cột đầu có bề rộng
+ * cố định, cột cuối lấy phần còn lại; font và màu chữ tùy từng cột; dữ liệu là {@code List<String[]>}.
+ * Đo và vẽ bằng {@link TextWrapper} (cùng thuật toán nên không cắt chữ), border của JScrollPane không bị JTable ghi đè,
+ * góc trên-phải liền màu tiêu đề. Là nền chung của lịch sử ({@link HistoryPage}) và {@link ResultTable}. Chạy trên EDT.
  */
-final class WrapTable extends JTable {
+class WrapTable extends JTable {
 
     /** Một cột: tiêu đề, font/màu chữ, bề rộng cố định (px) hoặc 0 cho cột co giãn (chỉ được là cột cuối). */
     record Column(String title, Font font, Color color, int fixedWidth) {
@@ -134,7 +135,10 @@ final class WrapTable extends JTable {
                 return; // chưa được bố trí
             }
         }
-        int lineHeight = wrappers[0].lineHeight();
+        int lineHeight = 0;
+        for (TextWrapper wrapper : wrappers) {
+            lineHeight = Math.max(lineHeight, wrapper.lineHeight());
+        }
         for (int row = 0; row < getRowCount(); row++) {
             String[] cells = data.rowAt(row);
             int lines = 1;

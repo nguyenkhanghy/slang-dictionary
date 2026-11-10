@@ -1,15 +1,16 @@
 package com.slangdict.ui;
 
+import java.awt.BorderLayout;
+import java.io.FileNotFoundException;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+
 import com.slangdict.service.DictionaryService;
 import com.slangdict.ui.components.ActionButton;
 import com.slangdict.ui.components.Theme;
-
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.io.FileNotFoundException;
 
 /**
  * Màn F7: khôi phục từ điển về danh sách gốc (lịch sử tìm kiếm được giữ). Luôn hỏi xác nhận trước (nút mặc định là "Hủy").
@@ -21,7 +22,7 @@ final class ResetPage extends JPanel {
     private final DictionaryService service;
     private final DataEvents events;
     private final Dialogs dialogs;
-    private final ActionButton resetButton = new ActionButton(Messages.RESET_BUTTON);
+    private final ActionButton resetButton = ActionButton.danger(Messages.RESET_BUTTON);
     private final StatusLine status = new StatusLine();
 
     ResetPage(DictionaryService service, DataEvents events, Dialogs dialogs) {

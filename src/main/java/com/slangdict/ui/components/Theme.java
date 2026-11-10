@@ -52,8 +52,10 @@ public final class Theme {
     public static final Color SCROLL_THUMB = new Color(0xC3CBD9);
     public static final Color SCROLL_THUMB_HOVER = new Color(0x97A3B8);
 
-    /** Chữ báo lỗi (thông báo lỗi bất ngờ). */
+    /** Chữ báo lỗi và nền nút nguy hiểm (chữ trắng trên màu này đạt tương phản ≥ 6:1). */
     public static final Color DANGER = new Color(0xB42318);
+    /** Nền nút nguy hiểm khi rê chuột/nhấn. */
+    public static final Color DANGER_DARK = new Color(0x912018);
     /** Nền dòng đang chọn trong bảng kết quả. */
     public static final Color TABLE_ROW_SELECTED = ACCENT_SOFT;
     /** Viền ô nhập; đổi sang màu nhấn khi ô đang có focus. */

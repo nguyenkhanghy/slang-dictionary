@@ -1,10 +1,10 @@
 package com.slangdict.ui;
 
-import com.slangdict.model.SearchType;
-import com.slangdict.service.ValidationException;
-
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import com.slangdict.model.SearchType;
+import com.slangdict.service.ValidationException;
 
 /**
  * MỌI chuỗi hiển thị cho người dùng nằm ở đây (tiếng Việt) để đổi ngôn ngữ ở một chỗ.
@@ -32,7 +32,7 @@ public final class Messages {
 
     public static final String HEADLESS =
             "Không tìm thấy màn hình để hiển thị giao diện (môi trường không có đồ họa).\n"
-                    + "Hãy chạy trên máy có giao diện đồ họa, hoặc thêm tham số --console để dùng menu dòng lệnh.";
+                    + "Hãy chạy ứng dụng trên máy có giao diện đồ họa.";
 
     /** Nội dung hộp thoại khi không mở được dữ liệu; luôn nêu thư mục dữ liệu, không kèm stack trace. */
     public static String errorOpenMessage(String dataDir, String reason) {
