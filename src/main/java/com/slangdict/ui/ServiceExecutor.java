@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
  * Một luồng nền duy nhất cho MỌI lời gọi {@code DictionaryService} từ UI.
  * Service không thread-safe nên các thao tác không được chạy đồng thời, kể cả khi hai trang cùng tìm một lúc;
  * dùng chung một hàng đợi một luồng thì các thao tác tự xếp hàng. Luồng là daemon nên không cản việc thoát.
- * U4 (ghi, reset, history) cũng phải gọi service qua executor này.
+ * Mọi thao tác ghi (thêm, sửa, xóa, reset) và history cũng phải gọi service qua executor này.
  */
 final class ServiceExecutor {
 

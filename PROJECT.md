@@ -224,7 +224,7 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | Q2 | **F9** Quiz: slang → 4 definition | M | `[x]` | |
 | Q3 | **F10** Quiz: definition → 4 slang | M | `[x]` | |
 | Q4 | Điểm số, streak, kết quả cuối quiz | O | `[ ]` | |
-| Q5 | Slang of the day cố định theo ngày (seed = ngày) | O | `[ ]` | |
+| Q5 | Slang of the day cố định theo ngày (seed = ngày) | O | `[x]` | |
 
 ### Phase 5 — GUI
 | ID | Task | Ưu tiên | Trạng thái | Notes |
@@ -244,7 +244,7 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 ### Phase 6–7 — Hardening & Delivery
 | ID | Task | Ưu tiên | Trạng thái | Notes |
 |----|------|:------:|:---------:|-------|
-| H1 | Xử lý ngoại lệ toàn cục (file thiếu/hỏng, index hỏng) — không crash | M | `[ ]` | |
+| H1 | Xử lý ngoại lệ toàn cục (file thiếu/hỏng, index hỏng) — không crash | M | `[x]` | |
 | H2 | Unit test các service quan trọng | O | `[ ]` | |
 | H3 | Dọn code, javadoc/comment tại phần quan trọng | M | `[ ]` | |
 | L1 | Build jar + test chạy trên máy sạch (kèm thư mục `data/`) | M | `[ ]` | |

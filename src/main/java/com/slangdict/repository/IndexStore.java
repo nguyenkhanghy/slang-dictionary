@@ -33,6 +33,7 @@ public final class IndexStore {
     private IndexStore() {
     }
 
+    /** Nạp index từ {@code indexFile} nếu còn hợp lệ so với {@code dataFile}; thiếu/hỏng/lệch → {@link Optional#empty()}, không ném lỗi. */
     public static Optional<SlangIndex> load(Path indexFile, Path dataFile) {
         if (!Files.isRegularFile(indexFile)) {
             return Optional.empty();
@@ -61,6 +62,7 @@ public final class IndexStore {
         }
     }
 
+    /** Ghi index (kèm kích thước + CRC32 của {@code dataFile}) bằng {@link AtomicFiles}. */
     public static void save(SlangIndex index, Path indexFile, Path dataFile) throws IOException {
         long size = Files.size(dataFile);
         long crc = crc32(dataFile);

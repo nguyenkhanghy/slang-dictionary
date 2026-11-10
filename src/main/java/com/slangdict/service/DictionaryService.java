@@ -136,6 +136,7 @@ public final class DictionaryService {
 
     // ------------------------------------------------------------------ info
 
+    /** Số entry hiện có. */
     public int size() {
         return index.size();
     }
@@ -195,6 +196,7 @@ public final class DictionaryService {
         return recent;
     }
 
+    /** Xóa toàn bộ history trong RAM và file; lỗi xóa file chỉ được log. */
     public void clearHistory() {
         history.clear();
         try {

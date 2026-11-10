@@ -35,6 +35,7 @@ public final class SlangFileReader {
     private SlangFileReader() {
     }
 
+    /** Đọc {@code file} thành danh sách slang theo quy tắc ở mô tả lớp; dòng hỏng bị bỏ và ghi log, chỉ lỗi I/O mới ném {@link IOException}. */
     public static List<SlangWord> read(Path file) throws IOException {
         List<SlangWord> words = new ArrayList<>(8192);
         int skipped = 0;
