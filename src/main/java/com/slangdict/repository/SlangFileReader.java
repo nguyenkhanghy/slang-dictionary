@@ -1,7 +1,5 @@
 package com.slangdict.repository;
 
-import com.slangdict.model.SlangWord;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.slangdict.model.SlangWord;
+
 /**
  * Đọc file slang (UTF-8). Định dạng mỗi dòng: {@code SLANG`meaning1| meaning2}.
  *
@@ -21,13 +21,16 @@ import java.util.logging.Logger;
  *       (vì có slang như {@code 8-|} chứa chính ký tự '|');</li>
  *   <li>strip khoảng trắng của slang và từng nghĩa; bỏ dòng trống, bỏ BOM, bỏ header {@code Slag`Meaning};</li>
  *   <li>PHÒNG THỦ: dòng thiếu {@code `} (nghĩa bị xuống dòng) được nối vào slang của dòng liền trước;</li>
- *   <li>dòng hỏng khác bị bỏ qua và ghi log WARNING (không throw) - không làm crash ứng dụng.</li>
+ *   <li>dòng hỏng khác bị bỏ qua và ghi log WARNING (tối đa {@value #MAX_LINE_WARNINGS} dòng đầu, không throw) - không làm crash ứng dụng.</li>
  * </ul>
  * Reader KHÔNG loại dòng trùng: người dùng có thể cố ý "duplicate" một slang (chức năng F4).
  */
 public final class SlangFileReader {
 
     private static final Logger LOG = Logger.getLogger(SlangFileReader.class.getName());
+
+    /** Chỉ log WARNING cho chừng này dòng lỗi đầu tiên; các dòng sau xuống FINE (tổng kết cuối vẫn là WARNING). */
+    private static final int MAX_LINE_WARNINGS = 20;
 
     private SlangFileReader() {
     }
@@ -54,11 +57,11 @@ public final class SlangFileReader {
                     // dòng "mồ côi": coi là phần nghĩa bị xuống dòng của entry trước
                     if (appendToPrevious(words, line)) {
                         merged++;
-                        LOG.log(Level.WARNING, "{0}:{1} line without ''`'', merged into previous entry: {2}",
+                        LOG.log(lineLevel(merged + skipped), "{0}:{1} line without ''`'', merged into previous entry: {2}",
                                 new Object[]{file.getFileName(), String.valueOf(lineNo), line});
                     } else {
                         skipped++;
-                        LOG.log(Level.WARNING, "{0}:{1} line without ''`'' skipped: {2}",
+                        LOG.log(lineLevel(merged + skipped), "{0}:{1} line without ''`'' skipped: {2}",
                                 new Object[]{file.getFileName(), String.valueOf(lineNo), line});
                     }
                     continue;
@@ -74,7 +77,7 @@ public final class SlangFileReader {
                     words.add(new SlangWord(slang, splitMeanings(meaningPart)));
                 } catch (IllegalArgumentException e) {
                     skipped++;
-                    LOG.log(Level.WARNING, "{0}:{1} invalid line skipped ({2}): {3}",
+                    LOG.log(lineLevel(merged + skipped), "{0}:{1} invalid line skipped ({2}): {3}",
                             new Object[]{file.getFileName(), String.valueOf(lineNo), e.getMessage(), line});
                 }
             }
@@ -85,6 +88,10 @@ public final class SlangFileReader {
                     new Object[]{file.getFileName(), String.valueOf(words.size()), String.valueOf(merged), String.valueOf(skipped)});
         }
         return words;
+    }
+
+    private static Level lineLevel(int problemsSoFar) {
+        return problemsSoFar <= MAX_LINE_WARNINGS ? Level.WARNING : Level.FINE;
     }
 
     private static boolean isHeader(String slang, String meaning) {

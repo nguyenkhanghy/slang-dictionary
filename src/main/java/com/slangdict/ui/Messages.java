@@ -30,6 +30,9 @@ public final class Messages {
 
     public static final String ERROR_OPEN_TITLE = "Không thể mở dữ liệu";
 
+    public static final String ERROR_UNEXPECTED_TITLE = "Đã xảy ra lỗi";
+    public static final String ERROR_UNEXPECTED_MESSAGE = "Chương trình gặp một lỗi không mong muốn.\nDữ liệu của bạn không bị ảnh hưởng. Nếu lỗi lặp lại, hãy đóng và mở lại ứng dụng.";
+    
     public static final String HEADLESS =
             "Không tìm thấy màn hình để hiển thị giao diện (môi trường không có đồ họa).\n"
                     + "Hãy chạy ứng dụng trên máy có giao diện đồ họa.";

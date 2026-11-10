@@ -6,6 +6,7 @@ import javax.swing.SwingUtilities;
 
 import com.slangdict.ui.AppLauncher;
 import com.slangdict.ui.Messages;
+import com.slangdict.util.LogSupport;
 
 /**
  * Điểm vào của ứng dụng: mở giao diện Swing ({@link AppLauncher}).
@@ -19,6 +20,7 @@ public final class Main {
     }
 
     public static void main(String[] args) {
+        LogSupport.configure(); // phải đứng đầu: trước khi bất kỳ Logger nào được dùng
         AppLauncher.configurePlatform();
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println(Messages.HEADLESS);

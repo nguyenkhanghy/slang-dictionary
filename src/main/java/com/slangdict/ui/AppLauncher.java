@@ -1,7 +1,6 @@
 package com.slangdict.ui;
 
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
@@ -9,6 +8,7 @@ import javax.swing.SwingWorker;
 import com.slangdict.service.DictionaryService;
 import com.slangdict.ui.components.Theme;
 import com.slangdict.util.AppPaths;
+import com.slangdict.util.LogSupport;
 
 /**
  * Khởi động giao diện: hiện cửa sổ tải ngay, mở {@link DictionaryService} ở luồng nền (không chặn EDT),
@@ -19,10 +19,11 @@ public final class AppLauncher {
     private static final Logger LOG = Logger.getLogger(AppLauncher.class.getName());
 
     private final LoadingWindow loading;
-    private final Dialogs dialogs = new SwingDialogs();
+    private final Dialogs dialogs;
     private boolean closeRequested; // chỉ đọc/ghi trên EDT
 
-    private AppLauncher() {
+    private AppLauncher(Dialogs dialogs) {
+        this.dialogs = dialogs;
         loading = new LoadingWindow(this::onLoadingClosed);
     }
 
@@ -31,10 +32,15 @@ public final class AppLauncher {
         System.setProperty("apple.awt.application.name", Messages.APP_NAME);
     }
 
-    /** Dựng giao diện. Phải gọi trên EDT (qua {@code SwingUtilities.invokeLater}). */
+    /**
+     * Dựng giao diện. Phải gọi trên EDT (qua {@code SwingUtilities.invokeLater}). Đăng ký {@link GlobalErrorHandler}
+     * trước mọi việc khác để ngoại lệ không bắt được không văng ra terminal.
+     */
     public static void start() {
+        Dialogs dialogs = new SwingDialogs();
+        GlobalErrorHandler.install(dialogs);
         Theme.install();
-        new AppLauncher().launch();
+        new AppLauncher(dialogs).launch();
     }
 
     private void launch() {
@@ -49,7 +55,7 @@ public final class AppLauncher {
 
     private void fail(Throwable cause) {
         loading.dispose();
-        LOG.log(Level.SEVERE, "Cannot open dictionary data: " + cause, cause);
+        LogSupport.severe(LOG, "Cannot open dictionary data", cause);
         if (closeRequested) {
             System.exit(0);
         }

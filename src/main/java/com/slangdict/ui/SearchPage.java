@@ -1,5 +1,23 @@
 package com.slangdict.ui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
+
 import com.slangdict.model.SearchType;
 import com.slangdict.model.SlangWord;
 import com.slangdict.service.DictionaryService;
@@ -10,24 +28,7 @@ import com.slangdict.ui.components.SearchField;
 import com.slangdict.ui.components.SlimScrollBarUI;
 import com.slangdict.ui.components.Theme;
 import com.slangdict.ui.components.WrappedText;
-
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingWorker;
-import javax.swing.Timer;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.slangdict.util.LogSupport;
 
 /**
  * Màn tìm kiếm dùng chung cho F1 (theo từ lóng) và F2 (theo nghĩa); {@link SearchType} quyết định gọi hàm service nào.
@@ -207,7 +208,7 @@ final class SearchPage extends JPanel implements DataAware {
         try {
             showOutcome(worker.get());
         } catch (ExecutionException e) {
-            LOG.log(Level.WARNING, "Search failed (" + type + "): " + e.getCause(), e.getCause());
+            LogSupport.warn(LOG, "Search failed (" + type + ")", e.getCause());
             showState(Messages.SEARCH_ERROR_TITLE, Messages.SEARCH_ERROR_DETAIL, true);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

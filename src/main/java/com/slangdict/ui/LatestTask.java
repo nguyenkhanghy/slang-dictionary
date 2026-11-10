@@ -3,16 +3,17 @@ package com.slangdict.ui;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
+
+import com.slangdict.util.LogSupport;
 
 /**
  * Chạy một việc nền (gọi service) qua {@link ServiceExecutor} và đưa kết quả về EDT, với quy tắc "yêu cầu mới nhất thắng":
  * chỉ một lượt chạy tại một thời điểm; {@link #request()} khi đang chạy chỉ nhớ rằng cần chạy lại, lượt đang chạy xong thì
  * kết quả của nó bị bỏ và lượt mới được chạy. Nhờ vậy bấm liên tiếp nhanh luôn cho ra kết quả của lần bấm cuối.
- * Mọi phương thức và callback chạy trên EDT. Lỗi của việc nền được log (WARNING) rồi báo qua {@code onFailure}.
+ * Mọi phương thức và callback chạy trên EDT. Lỗi của việc nền được log một dòng (WARNING, qua {@link LogSupport}) rồi báo qua {@code onFailure}.
  */
 final class LatestTask<T> {
 
@@ -71,7 +72,7 @@ final class LatestTask<T> {
     }
 
     private void fail(Throwable cause) {
-        LOG.log(Level.WARNING, "Background task failed (" + name + "): " + cause, cause);
+        LogSupport.warn(LOG, "Background task failed (" + name + ")", cause);
         onFailure.accept(cause);
     }
 }

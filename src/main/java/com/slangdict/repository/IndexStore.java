@@ -1,7 +1,5 @@
 package com.slangdict.repository;
 
-import com.slangdict.index.SlangIndex;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,9 +8,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
+
+import com.slangdict.index.SlangIndex;
+import com.slangdict.util.LogSupport;
 
 /**
  * Lưu/nạp index ra file nhị phân để các lần chạy sau KHÔNG phải index lại (yêu cầu R4).
@@ -56,7 +56,7 @@ public final class IndexStore {
             }
             return Optional.of(index);
         } catch (IOException | RuntimeException e) {
-            LOG.log(Level.WARNING, "Cannot load index file, will rebuild: " + e, e);
+            LogSupport.warn(LOG, "Cannot load index file, will rebuild", e);
             return Optional.empty();
         }
     }

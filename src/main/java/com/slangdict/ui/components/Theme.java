@@ -164,7 +164,7 @@ public final class Theme {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException | RuntimeException e) {
-            LOG.log(Level.WARNING, "Nimbus is unavailable, using the default look and feel: " + e, e);
+            com.slangdict.util.LogSupport.log(LOG, Level.WARNING, "Nimbus is unavailable, using the default look and feel: " + e, e);
         }
     }
 

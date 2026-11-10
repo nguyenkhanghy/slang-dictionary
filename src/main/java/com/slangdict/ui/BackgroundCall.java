@@ -1,13 +1,15 @@
 package com.slangdict.ui;
 
-import com.slangdict.service.ValidationException;
-
-import javax.swing.SwingWorker;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingWorker;
+
+import com.slangdict.service.ValidationException;
+import com.slangdict.util.LogSupport;
 
 /**
  * Một lời gọi service chạy MỘT LẦN trên luồng nền chung ({@link ServiceExecutor}), kết quả về EDT. Khác {@link LatestTask}:
@@ -44,7 +46,7 @@ final class BackgroundCall {
 
     private static void fail(String name, Throwable cause, Consumer<Throwable> onFailure) {
         Level level = cause instanceof ValidationException ? Level.FINE : Level.WARNING;
-        LOG.log(level, "Background call failed (" + name + "): " + cause, cause);
+        LogSupport.log(LOG, level, "Background call failed (" + name + ")", cause);
         onFailure.accept(cause);
     }
 }

@@ -1,17 +1,18 @@
 package com.slangdict.ui;
 
-import com.slangdict.service.DictionaryService;
-import com.slangdict.ui.components.Theme;
-
-import javax.swing.JFrame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+
+import com.slangdict.service.DictionaryService;
+import com.slangdict.ui.components.Theme;
+import com.slangdict.util.LogSupport;
 
 /**
  * Cửa sổ chính (kích thước mặc định/tối thiểu theo {@link Theme}). Nội dung nằm ở {@link MainPanel}.
@@ -54,9 +55,9 @@ public final class MainFrame extends JFrame {
             closing.get(CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOG.log(Level.WARNING, "Interrupted while waiting for the dictionary to close: " + e, e);
+            LogSupport.warn(LOG, "Interrupted while waiting for the dictionary to close", e);
         } catch (ExecutionException | TimeoutException e) {
-            LOG.log(Level.WARNING, "Dictionary did not close cleanly (index will be rebuilt next time): " + e, e);
+            LogSupport.warn(LOG, "Dictionary did not close cleanly (index will be rebuilt next time)", e);
         }
     }
 }

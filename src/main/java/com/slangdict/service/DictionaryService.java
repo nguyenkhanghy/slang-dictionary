@@ -1,17 +1,5 @@
 package com.slangdict.service;
 
-import com.slangdict.index.SlangIndex;
-import com.slangdict.model.HistoryEntry;
-import com.slangdict.model.SearchType;
-import com.slangdict.model.SlangWord;
-import com.slangdict.repository.DataBootstrap;
-import com.slangdict.repository.HistoryStore;
-import com.slangdict.repository.IndexStore;
-import com.slangdict.repository.SlangFileReader;
-import com.slangdict.repository.SlangFileWriter;
-import com.slangdict.util.AppPaths;
-import com.slangdict.util.TextNormalizer;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,6 +12,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.slangdict.index.SlangIndex;
+import com.slangdict.model.HistoryEntry;
+import com.slangdict.model.SearchType;
+import com.slangdict.model.SlangWord;
+import com.slangdict.repository.DataBootstrap;
+import com.slangdict.repository.HistoryStore;
+import com.slangdict.repository.IndexStore;
+import com.slangdict.repository.SlangFileReader;
+import com.slangdict.repository.SlangFileWriter;
+import com.slangdict.util.AppPaths;
+import com.slangdict.util.LogSupport;
+import com.slangdict.util.TextNormalizer;
 
 /**
  * Logic nghiệp vụ trung tâm (tầng service). KHÔNG import javax.swing; UI chỉ gọi class này.
@@ -97,7 +98,7 @@ public final class DictionaryService {
             try {
                 IndexStore.save(index, indexFile, dataFile);
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "Cannot save index file (will rebuild next time): " + e, e);
+                LogSupport.warn(LOG, "Cannot save index file (will rebuild next time)", e);
             }
         }
         long millis = (System.nanoTime() - start) / 1_000_000;
@@ -107,7 +108,7 @@ public final class DictionaryService {
         try {
             history = new ArrayList<>(store.loadAll());
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "Cannot read history file, starting with empty history: " + e, e);
+            LogSupport.warn(LOG, "Cannot read history file, starting with empty history", e);
             history = new ArrayList<>();
         }
         LOG.log(Level.INFO, "Opened {0} entries ({1}) in {2} ms",
@@ -129,7 +130,7 @@ public final class DictionaryService {
             IndexStore.save(index, indexFile, dataFile);
             indexDirty = false;
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "Cannot save index on close (will rebuild next time): " + e, e);
+            LogSupport.warn(LOG, "Cannot save index on close (will rebuild next time)", e);
         }
     }
 
@@ -199,7 +200,7 @@ public final class DictionaryService {
         try {
             historyStore.clear();
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "Cannot delete history file: " + e, e);
+            LogSupport.warn(LOG, "Cannot delete history file", e);
         }
     }
 
@@ -313,7 +314,7 @@ public final class DictionaryService {
             IndexStore.save(index, indexFile, dataFile);
             indexDirty = false;
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "Cannot save index after reset (will be retried on close): " + e, e);
+            LogSupport.warn(LOG, "Cannot save index after reset (will be retried on close)", e);
             indexDirty = true;
         }
     }
@@ -336,7 +337,7 @@ public final class DictionaryService {
             }
         } catch (IOException e) {
             // history là tính năng phụ: lỗi ghi file không được làm hỏng việc tìm kiếm
-            LOG.log(Level.WARNING, "Cannot write history file: " + e, e);
+            LogSupport.warn(LOG, "Cannot write history file", e);
         }
     }
 }
