@@ -177,6 +177,8 @@ public final class Messages {
     public static final String RANDOM_LABEL_MEANING = "Nghĩa";
     public static final String RANDOM_EMPTY_TITLE = "Từ điển đang trống";
     public static final String RANDOM_ERROR_TITLE = "Không thể chọn từ ngẫu nhiên";
+    public static final String RANDOM_TODAY_CAPTION = "Từ lóng của hôm nay";
+    public static final String RANDOM_PICKED_CAPTION = "Từ lóng ngẫu nhiên";
 
     public static String randomEmptyDetail() {
         return "Hãy thêm từ lóng ở mục “" + navLabel(Page.ADD) + "” hoặc khôi phục dữ liệu gốc.";

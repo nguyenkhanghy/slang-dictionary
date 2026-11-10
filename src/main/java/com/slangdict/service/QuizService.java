@@ -3,6 +3,7 @@ package com.slangdict.service;
 import com.slangdict.model.SlangWord;
 import com.slangdict.util.TextNormalizer;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * F8 (random slang) và F9/F10 (quiz 4 đáp án). Tầng service: không import Swing, không in ra console, không ghi file.
+ * F8 (từ lóng của ngày + từ lóng ngẫu nhiên) và F9/F10 (quiz 4 đáp án). Tầng service: không import Swing, không in ra console, không ghi file.
  *
  * <p>Luôn đọc dữ liệu hiện tại từ {@link DictionaryService#getAllWords()} (không cache), nên add/edit/delete/reset
  * giữa các câu hỏi có hiệu lực ngay. {@link Random} được truyền vào để test có seed. Không thread-safe.
@@ -66,6 +67,20 @@ public final class QuizService {
             return Optional.empty();
         }
         return Optional.of(all.get(random.nextInt(all.size())));
+    }
+
+    /**
+     * F8 "On this day": từ lóng của ngày {@code date}. Cùng ngày + cùng dữ liệu thì luôn ra cùng một từ (không phụ thuộc
+     * {@link Random} được truyền vào, nên khởi động lại hay tạo {@code QuizService} khác vẫn như nhau). Nếu dữ liệu thêm/xóa
+     * trong ngày (số entry đổi) thì từ của ngày có thể đổi theo. Rỗng nếu chưa có dữ liệu.
+     */
+    public Optional<SlangWord> slangOfTheDay(LocalDate date) {
+        List<SlangWord> all = dictionary.getAllWords();
+        if (all.isEmpty()) {
+            return Optional.empty();
+        }
+        long seed = date.toEpochDay() * 0x9E3779B97F4A7C15L; // nhân hằng số để các ngày liên tiếp không cho kết quả gần nhau
+        return Optional.of(all.get(new Random(seed).nextInt(all.size())));
     }
 
     /** F9: hiển thị 1 slang, 4 đáp án là nghĩa. */

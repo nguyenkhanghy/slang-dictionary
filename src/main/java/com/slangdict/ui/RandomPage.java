@@ -19,13 +19,16 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.time.LocalDate;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Màn F8: hiện một từ lóng ngẫu nhiên và nghĩa của nó, nút "Từ khác" để bốc lại.
+ * Màn F8: lần đầu hiện trang là "Từ lóng của hôm nay" (cố định theo ngày, {@link QuizService#slangOfTheDay}); nút "Từ khác"
+ * bốc một từ ngẫu nhiên ({@link QuizService#randomSlang()}). Nhãn trên thẻ cho biết từ đang hiện thuộc loại nào.
  *
  * <p>Từ đầu tiên được bốc tự động lần đầu trang được hiện; sau đó từ đang hiện được giữ khi chuyển trang. Việc bốc từ gọi
- * {@link QuizService#randomSlang()} trên luồng nền chung ({@link ServiceExecutor}); bấm liên tiếp nhanh thì luôn hiện kết quả
+ * service trên luồng nền chung ({@link ServiceExecutor}); bấm liên tiếp nhanh thì luôn hiện kết quả
  * của lần bấm cuối ({@link LatestTask}). Không ghi history.
  */
 final class RandomPage extends JPanel implements DataAware {
@@ -35,7 +38,7 @@ final class RandomPage extends JPanel implements DataAware {
     private static final String CARD_WORD = "word";
 
     /** Từ đã chọn, đã dựng sẵn chuỗi nghĩa trên luồng nền. */
-    private record Shown(String slang, String meaning) {
+    private record Shown(String slang, String meaning, boolean today) {
     }
 
     private final CardLayout cards = new CardLayout();
@@ -43,6 +46,9 @@ final class RandomPage extends JPanel implements DataAware {
     private final StateCard stateCard = new StateCard();
     private final WrapLabel slangLabel = new WrapLabel("", Theme.FONT_TITLE, Theme.TEXT, Theme.STATE_TEXT_MAX_WIDTH);
     private final WrapLabel meaningLabel = new WrapLabel("", Theme.FONT_BODY, Theme.TEXT, Theme.STATE_TEXT_MAX_WIDTH);
+    private final JLabel badgeLabel = new JLabel(" ");
+    /** Lượt bốc kế tiếp là "từ của hôm nay" (true) hay ngẫu nhiên (false); đọc ở luồng nền nên là AtomicBoolean. */
+    private final AtomicBoolean wantToday = new AtomicBoolean(true);
     private final LatestTask<Optional<Shown>> task;
     private boolean loadedOnce;
 
@@ -51,7 +57,7 @@ final class RandomPage extends JPanel implements DataAware {
         setBackground(Theme.BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL));
 
-        task = new LatestTask<>("random slang", () -> pick(quiz), this::show, this::showError);
+        task = new LatestTask<>("random slang", () -> pick(quiz, wantToday.get()), this::show, this::showError);
         add(buildHeader(), BorderLayout.NORTH);
         add(buildBody(), BorderLayout.CENTER);
 
@@ -61,6 +67,7 @@ final class RandomPage extends JPanel implements DataAware {
             public void componentShown(ComponentEvent e) {
                 if (!loadedOnce) {
                     loadedOnce = true;
+                    wantToday.set(true);
                     task.request();
                 }
             }
@@ -75,9 +82,9 @@ final class RandomPage extends JPanel implements DataAware {
     }
 
     /** Chạy trên luồng nền. */
-    private static Optional<Shown> pick(QuizService quiz) {
-        Optional<SlangWord> word = quiz.randomSlang();
-        return word.map(w -> new Shown(w.getSlang(), QuizService.meaningText(w)));
+    private static Optional<Shown> pick(QuizService quiz, boolean today) {
+        Optional<SlangWord> word = today ? quiz.slangOfTheDay(LocalDate.now()) : quiz.randomSlang();
+        return word.map(w -> new Shown(w.getSlang(), QuizService.meaningText(w), today));
     }
 
     // ------------------------------------------------------------------ dựng giao diện
@@ -105,7 +112,10 @@ final class RandomPage extends JPanel implements DataAware {
     /** Nút luôn hiện (không nằm trong thẻ từ) để vẫn thử lại được khi từ điển trống hoặc bốc từ bị lỗi. */
     private JComponent buildNextButtonRow() {
         ActionButton next = new ActionButton(Messages.RANDOM_BUTTON);
-        next.addActionListener(e -> task.request());
+        next.addActionListener(e -> {
+            wantToday.set(false);
+            task.request();
+        });
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
         row.add(next, BorderLayout.WEST);
@@ -134,11 +144,15 @@ final class RandomPage extends JPanel implements DataAware {
         inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         inner.setBorder(BorderFactory.createEmptyBorder(Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL, Theme.SPACE_XL));
+        badgeLabel.setFont(Theme.FONT_BODY_BOLD);
+        badgeLabel.setForeground(Theme.TEXT);
         JLabel slangCaption = caption(Messages.RANDOM_LABEL_SLANG);
         JLabel meaningCaption = caption(Messages.RANDOM_LABEL_MEANING);
-        for (JComponent c : new JComponent[]{slangCaption, slangLabel, meaningCaption, meaningLabel}) {
+        for (JComponent c : new JComponent[]{badgeLabel, slangCaption, slangLabel, meaningCaption, meaningLabel}) {
             c.setAlignmentX(LEFT_ALIGNMENT);
         }
+        inner.add(badgeLabel);
+        inner.add(Box.createVerticalStrut(Theme.SPACE_M));
         inner.add(slangCaption);
         inner.add(Box.createVerticalStrut(Theme.SPACE_XS));
         inner.add(slangLabel);
@@ -179,6 +193,7 @@ final class RandomPage extends JPanel implements DataAware {
             cards.show(body, CARD_STATE);
             return;
         }
+        badgeLabel.setText(shown.get().today() ? Messages.RANDOM_TODAY_CAPTION : Messages.RANDOM_PICKED_CAPTION);
         slangLabel.setText(shown.get().slang());
         meaningLabel.setText(shown.get().meaning());
         cards.show(body, CARD_WORD);
