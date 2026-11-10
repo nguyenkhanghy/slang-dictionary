@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 /**
  * Đoạn văn tự xuống dòng theo một chiều rộng tối đa cố định (tự đo bằng {@link FontMetrics}, không dùng HTML:
  * HTML của Swing quy đổi px khác nhau giữa các hệ điều hành). Kích thước cố định nên bố cục không phụ thuộc cửa sổ.
+ * Giữ ngắt đoạn (ký tự xuống dòng trong chuỗi) và bẻ cứng từ dài hơn một dòng (ví dụ đường dẫn thư mục).
  */
 public final class WrappedText extends JComponent {
 
@@ -31,22 +32,52 @@ public final class WrappedText extends JComponent {
         setMaximumSize(size);
     }
 
+    /** Mỗi đoạn (ngăn bằng xuống dòng) tự xuống dòng riêng; đoạn trống thành một dòng trống. Chuỗi rỗng: không có dòng. */
     private static List<String> wrap(String text, FontMetrics metrics, int maxWidth) {
         List<String> result = new ArrayList<>();
+        String stripped = text.strip();
+        if (stripped.isEmpty()) {
+            return result;
+        }
+        for (String paragraph : stripped.split("\\R", -1)) {
+            wrapParagraph(paragraph.strip(), metrics, maxWidth, result);
+        }
+        return result;
+    }
+
+    private static void wrapParagraph(String paragraph, FontMetrics metrics, int maxWidth, List<String> result) {
+        if (paragraph.isEmpty()) {
+            result.add("");
+            return;
+        }
         StringBuilder line = new StringBuilder();
-        for (String word : text.strip().split("\\s+")) {
+        for (String word : paragraph.split("\\s+")) {
             String candidate = line.length() == 0 ? word : line + " " + word;
             if (line.length() > 0 && metrics.stringWidth(candidate) > maxWidth) {
                 result.add(line.toString());
-                line = new StringBuilder(word);
-            } else {
-                line = new StringBuilder(candidate);
+                candidate = word;
+            }
+            line = new StringBuilder(candidate);
+            // Từ dài hơn một dòng: bẻ cứng, phần còn lại tiếp tục làm dòng hiện tại.
+            while (line.length() > 1 && metrics.stringWidth(line.toString()) > maxWidth) {
+                int cut = fittingLength(line, metrics, maxWidth);
+                result.add(line.substring(0, cut));
+                line = new StringBuilder(line.substring(cut));
             }
         }
         if (line.length() > 0) {
             result.add(line.toString());
         }
-        return result;
+    }
+
+    /** Số ký tự đầu của {@code text} còn vừa {@code maxWidth} (ít nhất 1 để luôn tiến lên). */
+    private static int fittingLength(CharSequence text, FontMetrics metrics, int maxWidth) {
+        int length = 1;
+        while (length < text.length()
+                && metrics.stringWidth(text.subSequence(0, length + 1).toString()) <= maxWidth) {
+            length++;
+        }
+        return length;
     }
 
     @Override
