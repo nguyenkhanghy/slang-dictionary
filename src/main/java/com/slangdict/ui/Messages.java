@@ -102,8 +102,6 @@ public final class Messages {
         };
     }
 
-    public static final String PLACEHOLDER_STATUS = "Màn hình này đang được xây dựng.";
-
     // ------------------------------------------------------------------ màn tìm kiếm (F1, F2)
 
     /** Số ký tự tối đa của từ khóa được trích lại trong thông báo (từ khóa dài bị cắt bằng "…"). */

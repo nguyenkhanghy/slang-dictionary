@@ -2,7 +2,7 @@
 
 Ứng dụng từ điển tiếng lóng (Java 17, Swing) — Đồ án DAMH#1, môn CSC13002 Lập trình ứng dụng Java (HCMUS – FIT).
 
-> Mô tả đầy đủ yêu cầu, kiến trúc, roadmap, task tracker và quy tắc làm việc: xem [`PROJECT.md`](PROJECT.md). Ghi chú cấu trúc dữ liệu: [`docs/design-notes.md`](docs/design-notes.md).
+> Mô tả đầy đủ yêu cầu, kiến trúc, roadmap, task tracker và quy tắc làm việc: xem [`PROJECT.md`](PROJECT.md)
 
 ## Chức năng
 Tìm theo từ lóng (F1) và theo nghĩa (F2), lịch sử tìm kiếm (F3), thêm có xử lý trùng Overwrite/Duplicate (F4), sửa (F5), xóa có xác nhận (F6), khôi phục dữ liệu gốc (F7), từ lóng của ngày + từ ngẫu nhiên (F8), hai loại quiz 4 đáp án (F9, F10). Giao diện tiếng Việt, chạy hoàn toàn offline.
@@ -47,6 +47,3 @@ java -cp target/classes:target/test-classes com.slangdict.DailySlangCheck # từ
 java tools/ValidateData.java data/slang.original.txt   # kiểm tra file dữ liệu (mong đợi 0 ERROR)
 java tools/GenerateBigData.java                         # sinh data/slang.100k.txt để test hiệu năng
 ```
-
-## Đóng gói nộp bài
-Đặt `slang-dictionary.jar` và thư mục `data/` (chỉ chứa `slang.original.txt`) **cùng một thư mục**, rồi nén cùng source, ảnh commit, file tự chấm điểm. Chi tiết các bước và lệnh: [`docs/submission-checklist.md`](docs/submission-checklist.md); kiểm tra trên máy sạch: [`docs/clean-machine-test.md`](docs/clean-machine-test.md).

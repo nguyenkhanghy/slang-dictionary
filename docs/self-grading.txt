@@ -1,0 +1,73 @@
+=====================================================================
+ TỰ CHẤM ĐIỂM — ĐỒ ÁN CÁ NHÂN DAMH#1: SLANG DICTIONARY
+ Môn: CSC13002 — Lập trình ứng dụng Java (HCMUS-FIT)
+=====================================================================
+ MSSV      : 24127280
+ Họ và tên : Nguyễn Khang Hy
+ Video YouTube (cấu trúc dữ liệu, % demo các chức năng): https://youtu.be/YrNT7M5KyJg
+ Repo GitHub: https://github.com/nguyenkhanghy/slang-dictionary
+ Công nghệ  : Java 17, Maven, Swing (Nimbus + Theme tự vẽ); chỉ dùng JDK, chạy hoàn toàn offline.
+ Chạy       : java -jar slang-dictionary.jar  (thư mục data/ nằm cạnh file jar, cần quyền ghi)
+ Dữ liệu    : data/slang.original.txt (7.641 từ lóng sau khi làm sạch lỗi; chỉ đọc)
+
+---------------------------------------------------------------------
+ A. CÁC CHỨC NĂNG (mỗi chức năng tối đa 10 điểm)
+---------------------------------------------------------------------
+ Quy tắc của đề (mục IV.2): mỗi chức năng 10 điểm; chạy chậm quá 1 s thì tự trừ 50%; giao diện không tiện dụng thì tự trừ 30%;
+ chạy sai thì 0 điểm. Tổng điểm này phải khớp với con số trong tên file zip (nếu tên zip chứa điểm).
+ Điểm tự chấm do sinh viên quyết định. Cột "Gợi ý" là mức tối đa mà bằng chứng hiện có cho phép
+ (mọi chức năng đã chạy đúng trên GUI thật và được tự kiểm tra); sinh viên tự chốt con số cuối.
+
+ ID  | Chức năng                       | Tự chấm | Cài đặt chính (nơi code)                                   | Kiểm chứng / hiệu năng
+-----+---------------------------------+---------+------------------------------------------------------------+-------------------------------------------------------------
+ F1  | Tìm theo từ lóng                | 10/10  | service/DictionaryService.searchBySlang -> index/SlangIndex  | HashMap khóa IN HOA (không phân biệt hoa/thường): O(1).
+     |                                 |        | .findBySlang; ui/SearchPage                                | PerfCheck (100.000 từ) so với mô hình tham chiếu: đúng, vài ms.
+ F2  | Tìm theo định nghĩa (hiện TẤT CẢ)| 10/10 | DictionaryService.searchByDefinition -> SlangIndex           | Khớp chuỗi con, không phân biệt hoa/thường, dùng inverted index
+     |                                 |        | .findByDefinition (inverted index + kiểm tra lại); SearchPage| rồi kiểm tra lại. 100k từ: đa số < 3 ms, một số truy vấn ngắn
+     |                                 |         |                                                            | (c++, :), 's) 16–21 ms, tối đa 58 ms. Không giới hạn số kết quả
+     |                                 |         |                                                            | (truy vấn "a" trên 100k = 87.746 dòng, hiển thị ≈ 0,14 s).
+ F3  | History các từ đã tìm           |  10/10  | repository/HistoryStore (FILE RIÊNG data/history.txt);       | Ghi append O(1); hiển thị mới nhất trước (tối đa 1.000 dòng);
+     |                                 |         | ui/HistoryPage                                             | có nút xóa lịch sử (có xác nhận). Reset không xóa history.
+ F4  | Thêm từ lóng; trùng thì hỏi     |  10/10  | service/InputValidator + DictionaryService.addSlang          | Kiểm tra dữ liệu nhập; trùng khóa -> hộp thoại hỏi Overwrite /
+     | Overwrite hay Duplicate         |         | (DuplicatePolicy); ui/AddPage, Dialogs                    | Duplicate / hủy [KIỂM TRA LẠI TÊN NÚT TRÊN GUI]. Ghi file txt
+     |                                 |         |                                                            | trước, rồi cập nhật index tăng dần (không build lại).
+ F5  | Sửa một từ lóng                 |  10/10  | DictionaryService.editSlang; ui/EditPage, EntryPicker        | Chọn đúng entry (kể cả slang trùng khóa); báo xung đột khi đổi
+     |                                 |         |                                                            | sang khóa đã có; MutationCheck so với mô hình tham chiếu.
+ F6  | Xóa một từ lóng (có confirm)    |  10/10  | DictionaryService.deleteSlang; ui/DeletePage, Dialogs        | Có hộp thoại xác nhận, nút nền đỏ cho hành động phá hủy.
+     |                                 |         |                                                            |
+ F7  | Reset về dữ liệu gốc            |  10/10  | DictionaryService.resetToOriginal; ui/ResetPage              | Có xác nhận; chép slang.original.txt (không bao giờ bị sửa)
+     |                                 |         |                                                            | đè slang.current.txt bằng file tạm + move; build lại index.
+ F8  | Random 1 từ lóng ("On this day")|  10/10  | service/QuizService.slangOfTheDay (seed = ngày) + randomSlang;| Lần đầu vào trang: "Từ lóng của hôm nay" (cùng ngày luôn ra
+     |                                 |         | ui/RandomPage (nhãn cho biết từ của ngày hay ngẫu nhiên)    | cùng một từ, kể cả sau khi mở lại); nút "Từ khác" bốc ngẫu nhiên.
+     |                                 |         |                                                            | DailySlangCheck: cùng ngày cùng từ, 365 ngày ≈ 356 từ khác nhau.
+ F9  | Quiz: 1 từ lóng, 4 đáp án nghĩa |  10/10  | service/QuizService; ui/QuizPage, OptionCard                 | 4 đáp án khác nhau, đúng 1 đáp án đúng; QuizCheck.
+     |                                 |         |                                                            |
+ F10 | Quiz: 1 nghĩa, 4 đáp án từ lóng |  10/10  | QuizService; QuizPage                                        | Như F9.
+     |                                 |         |                                                            |
+-----+---------------------------------+---------+------------------------------------------------------------+-------------------------------------------------------------
+ TỔNG CHỨC NĂNG: 100 / 100
+
+---------------------------------------------------------------------
+ B. YÊU CẦU CHUNG
+---------------------------------------------------------------------
+ R1  Java IO, OOP, Collections + Generics ......... Có (SlangWord bất biến, HashMap/List/Optional, generic LatestTask<T>...)
+ R2  Giao diện Swing, có thanh điều hướng ......... Có (sidebar trái, 10 chức năng)
+ R3  Load file -> cấu trúc dữ liệu tối ưu ......... Có: List<SlangWord> + Map<String, IntList> (khóa IN HOA) + inverted index
+ R4  Lưu index ra file ............................ Có: data/slang.index.bin (nhị phân tự định nghĩa, hợp lệ khi kích thước + CRC32
+                                                    của slang.current.txt khớp; hỏng/lệch -> tự build lại, không crash). Mở 7.641 từ ≈ 26 ms
+                                                    (từ cache) / 69 ms (build lại).
+ R5  Lưu danh sách sau add/edit/delete ............ Có: ghi slang.current.txt trước (file tạm + move), rồi mới đổi RAM
+ R6  Không chỉ dùng List .......................... Có: Map + inverted index
+
+ Xử lý dữ liệu lỗi: header, dòng "mồ côi" (nghĩa bị xuống dòng), khoảng trắng thừa, lỗi mã hóa, dòng trùng, slang chứa '|'
+ đều được xử lý; SlangFileReader phòng thủ (dòng hỏng bị bỏ + log, không crash). File dữ liệu/index/history thiếu hoặc hỏng không làm
+ ứng dụng crash (hộp thoại thân thiện hoặc tự phục hồi). History ở một file riêng. Chạy hoàn toàn offline.
+
+---------------------------------------------------------------------
+ C. HẠN CHẾ
+---------------------------------------------------------------------
+ - F8: từ của ngày được chọn theo seed = ngày trên dữ liệu hiện tại; nếu thêm/xóa từ trong ngày thì từ của ngày có thể đổi.
+ - Truy vấn rất lớn (vd "a" trên 100k) khựng ≈ 0,1–0,15 s lúc hiện kết quả.
+ - Chưa có unit test JUnit; kiểm thử bằng PerfCheck, MutationCheck, QuizCheck (chạy tay, so với mô hình tham chiếu đơn giản).
+ - Chưa có dark mode, phím tắt, undo (các nhiệm vụ tùy chọn trong PROJECT.md).
+=====================================================================
