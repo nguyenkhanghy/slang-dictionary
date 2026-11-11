@@ -29,7 +29,7 @@
  F3  | History các từ đã tìm           |  10/10  | repository/HistoryStore (FILE RIÊNG data/history.txt);       | Ghi append O(1); hiển thị mới nhất trước (tối đa 1.000 dòng);
      |                                 |         | ui/HistoryPage                                             | có nút xóa lịch sử (có xác nhận). Reset không xóa history.
  F4  | Thêm từ lóng; trùng thì hỏi     |  10/10  | service/InputValidator + DictionaryService.addSlang          | Kiểm tra dữ liệu nhập; trùng khóa -> hộp thoại hỏi Overwrite /
-     | Overwrite hay Duplicate         |         | (DuplicatePolicy); ui/AddPage, Dialogs                    | Duplicate / hủy [KIỂM TRA LẠI TÊN NÚT TRÊN GUI]. Ghi file txt
+     | Overwrite hay Duplicate         |         | (DuplicatePolicy); ui/AddPage, Dialogs                    | Duplicate / hủy. Ghi file txt
      |                                 |         |                                                            | trước, rồi cập nhật index tăng dần (không build lại).
  F5  | Sửa một từ lóng                 |  10/10  | DictionaryService.editSlang; ui/EditPage, EntryPicker        | Chọn đúng entry (kể cả slang trùng khóa); báo xung đột khi đổi
      |                                 |         |                                                            | sang khóa đã có; MutationCheck so với mô hình tham chiếu.
