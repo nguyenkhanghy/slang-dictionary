@@ -294,30 +294,29 @@ Quan sát dữ liệu thật: có **17 slang bị trùng key** (vd `AWS`, `CHEES
 | 2026-11-07 | Đo thực tế: parse text 100.000 entry ≈ 0,4–0,5s | Chỉ riêng load text đã gần ngưỡng 1s → **bắt buộc** persist index (task C3) |
 | 2026-11-07 | Index lưu bằng định dạng nhị phân tự viết; hợp lệ khi (size, CRC32) của `slang.current.txt` khớp | Nhanh hơn Java Serialization; không bị vô hiệu khi giải nén zip |
 | 2026-11-07 | F1 khớp chính xác (không phân biệt hoa/thường); F2 khớp chuỗi con | Đúng chữ "chứa keyword" trong đề; vẫn nhanh nhờ inverted index |
-
-| 2026-11-07 | Đo (100k, JVM nguội): đọc txt ~0,5s, build index ~0,5s, lưu ~0,3s, nạp cache ~0,3–0,5s; truy vấn F1/F2 ≤ vài ms | Build lại toàn bộ ≈ 1s → **Phase 3: add/edit/delete phải cập nhật index tăng dần**, ghi txt ngay, ghi index khi thoát/gom lại |
-| 2026-11-08 | Ghi txt trước, đổi RAM sau; index lưu ở `close()` | Ghi file lỗi thì RAM không đổi (an toàn dữ liệu) |
-| 2026-11-08 | Overwrite thay tất cả entry cùng key bằng 1 entry mới đặt tại vị trí đầu | Đơn giản hóa UI F4/F5 |
-| 2026-11-08 | Reset danh sách về gốc nhưng **GIỮ LẠI history** | History là hành vi người dùng, không thuộc data gốc |
-| 2026-11-08 | Thao tác ghi sẽ chép đè nguyên file `slang.current.txt` thay vì append | Đo thực tế chỉ mất 15-140ms ở 100k, đủ nhanh không cần append phức tạp |
-| 2026-11-08 | Không dùng FlatLaf, dùng Nimbus + Theme tự vẽ | Không phụ thuộc thư viện ngoài |
-| 2026-11-08 | Ngôn ngữ UI là Tiếng Việt, dùng Sidebar trái, Theme sáng, màu Blue | Dễ dùng, trực quan, nhất quán |
-| 2026-11-08 | Kích thước GUI mặc định 1000x680, tối thiểu 820x560 | Tối ưu trải nghiệm người dùng |
-| 2026-11-08 | Màn Search: bảng hai cột "Từ lóng | Nghĩa", hàng co theo nghĩa, hiện TẤT CẢ kết quả. | Yêu cầu của đề là không giới hạn kết quả |
-| 2026-11-08 | Tìm kiếm chạy bằng `SwingWorker` đẩy vào `ServiceExecutor`. | Đảm bảo UI không đơ; Service không thread-safe |
-| 2026-11-08 | Kích hoạt tìm: Enter hoặc nút "Tìm" (không tìm-khi-gõ). | Không làm rác file history |
-| 2026-11-08 | Nút × xóa nhanh đưa về trạng thái "chưa tìm". | Thân thiện với người dùng, không ghi history |
-| 2026-11-08 | Không chuyển thẳng từ Search sang Add/Edit/Delete ở U3. | Giao diện quản lý sẽ được tách làm riêng ở U4c |
-| 2026-11-10 | Xóa chế độ `--console` và `dev/DevConsole`; `Main` bỏ qua tham số. | Chuyển sang ứng dụng GUI thuần túy, loại bỏ các thành phần rác của phase trước. |
-| 2026-11-10 | Nút phá hủy dùng `ActionButton.danger` (nền `Theme.DANGER`, hover `Theme.DANGER_DARK`, chữ trắng). | Giúp phân biệt rõ ràng các hành động nguy hiểm (xóa/khôi phục), tránh thao tác nhầm. |
-| 2026-11-10 | `ResultTable` trở thành lớp con của `WrapTable`; `ResultTableModel` bị xóa. | Giảm nợ kỹ thuật, hợp nhất logic hiển thị bảng để dễ bảo trì. |
-| 2026-11-10 | Hộp thoại lỗi mở dữ liệu của `AppLauncher` đi qua `Dialogs.error`; giữ `JOptionPane` làm cài đặt mặc định. | Đồng bộ hóa hệ thống thông báo toàn dự án mà không tốn công vẽ lại UI phức tạp. |
-| 2026-11-10 | Không làm icon sidebar. | Giữ giao diện thống nhất, tối giản theo quyết định từ ban đầu. |
+| 2026-11-07 | Đo (100k, JVM nguội): đọc TXT ~0,5s, build index ~0,5s, lưu index ~0,3s, nạp cache ~0,3–0,5s; truy vấn F1/F2 ≤ vài ms. | Build lại toàn bộ mất ~1s → **Phase 3: Add/Edit/Delete phải cập nhật index tăng dần**, ghi TXT ngay và lưu index khi thoát/gom lại. |
+| 2026-11-08 | Ghi TXT trước, cập nhật RAM sau; index được lưu trong `close()`. | Nếu ghi file thất bại, RAM không thay đổi, đảm bảo an toàn dữ liệu. |
+| 2026-11-08 | Overwrite thay thế tất cả entry cùng key bằng một entry mới, đặt tại vị trí đầu tiên. | Đơn giản hóa UI F4/F5. |
+| 2026-11-08 | Reset danh sách về dữ liệu gốc nhưng **GIỮ LẠI history**. | History là hành vi người dùng, không thuộc dữ liệu gốc. |
+| 2026-11-08 | Thao tác ghi sẽ chép đè toàn bộ file `slang.current.txt` thay vì append. | Đo thực tế chỉ mất 15–140 ms ở 100k entry, đủ nhanh, không cần append phức tạp. |
+| 2026-11-08 | Không dùng FlatLaf, sử dụng Nimbus kết hợp Theme tự vẽ. | Không phụ thuộc thư viện bên ngoài. |
+| 2026-11-08 | Ngôn ngữ UI là Tiếng Việt, sử dụng Sidebar bên trái, Theme sáng, màu chủ đạo Blue. | Dễ dùng, trực quan và nhất quán. |
+| 2026-11-08 | Kích thước GUI mặc định 1000 × 680, tối thiểu 820 × 560. | Tối ưu trải nghiệm người dùng. |
+| 2026-11-08 | Màn Search sử dụng bảng hai cột "Từ lóng \| Nghĩa", hàng tự co giãn theo nội dung nghĩa và hiển thị TẤT CẢ kết quả. | Yêu cầu của đề là không giới hạn kết quả. |
+| 2026-11-08 | Tìm kiếm chạy bằng `SwingWorker`, đẩy vào `ServiceExecutor`. | Đảm bảo UI không đơ; Service không thread-safe. |
+| 2026-11-08 | Kích hoạt tìm kiếm bằng Enter hoặc nút "Tìm", không tìm kiếm khi đang gõ. | Không làm rác file history. |
+| 2026-11-08 | Nút × xóa nhanh đưa giao diện về trạng thái "chưa tìm". | Thân thiện với người dùng, không ghi history. |
+| 2026-11-08 | Không chuyển thẳng từ Search sang Add/Edit/Delete ở U3. | Giao diện quản lý sẽ được tách riêng ở U4c. |
+| 2026-11-10 | Xóa chế độ `--console` và `dev/DevConsole`; `Main` bỏ qua tham số. | Chuyển sang ứng dụng GUI thuần túy, loại bỏ các thành phần không còn sử dụng của phase trước. |
+| 2026-11-10 | Nút phá hủy sử dụng `ActionButton.danger` (nền `Theme.DANGER`, hover `Theme.DANGER_DARK`, chữ trắng). | Giúp phân biệt rõ các hành động nguy hiểm (xóa/khôi phục), tránh thao tác nhầm. |
+| 2026-11-10 | `ResultTable` trở thành lớp con của `WrapTable`; xóa `ResultTableModel`. | Giảm nợ kỹ thuật, hợp nhất logic hiển thị bảng để dễ bảo trì. |
+| 2026-11-10 | Hộp thoại lỗi mở dữ liệu của `AppLauncher` đi qua `Dialogs.error`; giữ `JOptionPane` làm cài đặt mặc định. | Đồng bộ hệ thống thông báo toàn dự án mà không tốn công vẽ lại UI phức tạp. |
+| 2026-11-10 | Không làm icon Sidebar. | Giữ giao diện thống nhất, tối giản theo quyết định ban đầu. |
 | 2026-11-10 | `WrappedText` được sửa để hiểu ngắt đoạn `\n` và bẻ cứng từ dài. | Khắc phục lỗi dính chữ và tràn hộp thoại đối với các đường dẫn hệ thống dài. |
-| 2026-11-10 | `slang.index.bin` không commit và không nộp; `data/` trong zip chỉ có `slang.original.txt` | App tự build index lần đầu (≈ 70 ms với 7.641 từ) |
-| 2026-11-10 | Mọi log kèm exception đi qua `util/LogSupport`; terminal một dòng, stack trace chỉ khi `-Dslang.debug=true` | Terminal gọn, vẫn debug được khi cần |
-| 2026-11-10 | `GlobalErrorHandler` bắt ngoại lệ không xử lý; hộp thoại chung tối đa một lần mỗi lần chạy, chỉ khi lỗi ở EDT | Không crash, không spam cửa sổ |
-| 2026-11-10 | Không ghi log ra file | Tránh thêm file ghi |
-| 2026-11-10 | `slang.current.txt` sai UTF-8: báo lỗi và thoát (mã 1), không tự khôi phục từ file gốc | Tránh âm thầm làm mất dữ liệu người dùng |
-| 2026-11-10 | F8: lần đầu vào trang là "Từ lóng của hôm nay" (seed = ngày), nút "Từ khác" bốc ngẫu nhiên | Đúng chữ "On this day"; từ của ngày có thể đổi nếu số entry đổi trong ngày |
-| 2026-11-10 | `PageFactory.create` không có nhánh `default`; xóa `PlaceholderPage` | Thêm `Page` mới mà thiếu màn sẽ báo lỗi biên dịch |
+| 2026-11-10 | `slang.index.bin` không commit và không nộp; thư mục `data/` trong ZIP chỉ có `slang.original.txt`. | App tự build index lần đầu (≈ 70 ms với 7.641 từ). |
+| 2026-11-10 | Mọi log kèm exception đi qua `util/LogSupport`; terminal chỉ hiển thị một dòng, stack trace chỉ khi bật `-Dslang.debug=true`. | Terminal gọn, vẫn debug được khi cần. |
+| 2026-11-10 | `GlobalErrorHandler` bắt ngoại lệ không xử lý; hộp thoại chung tối đa một lần mỗi lần chạy, chỉ khi lỗi xảy ra trên EDT. | Tránh crash và spam cửa sổ thông báo. |
+| 2026-11-10 | Không ghi log ra file. | Tránh phát sinh thêm file ghi. |
+| 2026-11-10 | `slang.current.txt` sai UTF-8: báo lỗi và thoát (mã 1), không tự khôi phục từ file gốc. | Tránh âm thầm làm mất dữ liệu người dùng. |
+| 2026-11-10 | F8: lần đầu vào trang hiển thị "Từ lóng của hôm nay" (seed = ngày); nút "Từ khác" bốc ngẫu nhiên. | Đúng ý tưởng "On this day"; từ của ngày có thể thay đổi nếu số entry đổi trong ngày. |
+| 2026-11-10 | `PageFactory.create` không có nhánh `default`; xóa `PlaceholderPage`. | Thêm `Page` mới mà thiếu màn hình tương ứng sẽ báo lỗi biên dịch. |
